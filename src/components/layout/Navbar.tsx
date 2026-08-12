@@ -25,10 +25,10 @@ export default function Navbar() {
     <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 flex-1 min-w-0 mr-2 lg:mr-4">
-            <img src="/logo_v2.png" alt="Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0" />
+          <Link to="/" className="flex items-center gap-3 flex-1 min-w-0 mr-4">
+            <img src="/logo_v2.png" alt="Logo" className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0" />
             <div className="hidden sm:block min-w-0">
-              <div className="text-[8px] sm:text-[9px] lg:text-[10px] font-semibold text-[#1a3b8b] leading-tight line-clamp-3">{t('brand.subtitle')}</div>
+              <div className="text-[10px] sm:text-[11px] font-bold text-[#1a3b8b] leading-[1.3] whitespace-normal max-w-[320px]">{t('brand.subtitle')}</div>
             </div>
           </Link>
 
@@ -38,10 +38,10 @@ export default function Navbar() {
                 key={link.to}
                 to={link.to}
                 className={cn(
-                  "px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
+                  "px-2 py-1 text-[13px] sm:text-sm font-medium transition-all whitespace-nowrap border-b-2",
                   location.pathname === link.to
-                    ? "bg-[#e8f0fe] text-[#1a56db]"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-800"
+                    ? "text-[#1a3b8b] border-amber-500"
+                    : "text-slate-600 border-transparent hover:text-[#1a3b8b]"
                 )}
               >
                 {t(link.key)}
