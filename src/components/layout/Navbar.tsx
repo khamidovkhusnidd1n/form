@@ -26,7 +26,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 shrink-0 max-w-[55%] lg:max-w-[45%]">
-            <img src="/logo.png" alt="Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0" />
+            <img src="/logo_v2.png" alt="Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0" />
             <div className="hidden sm:block min-w-0">
               <div className="text-[8px] sm:text-[9px] lg:text-[10px] font-semibold text-[#1a3b8b] leading-tight line-clamp-3">{t('brand.subtitle')}</div>
             </div>

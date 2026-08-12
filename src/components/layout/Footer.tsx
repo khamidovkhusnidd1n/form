@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2.5 mb-4 max-w-[80%]">
-              <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+              <img src="/logo_v2.png" alt="Logo" className="w-12 h-12 object-contain" />
               <div>
                 <div className="text-[10px] sm:text-xs font-semibold text-slate-300 leading-tight whitespace-pre-wrap">{t('brand.subtitle')}</div>
               </div>
