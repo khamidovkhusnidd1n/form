@@ -331,7 +331,7 @@ export const translations = {
     'footer.quickLinks': 'Quick links',
     'footer.contact': 'Contact',
     'footer.admin': 'Admin panel',
-    'brand.subtitle': 'Academy of Arts and Culture',
+    'brand.subtitle': "Center for Retraining and Professional Development of Pedagogical and Specialist Personnel in Art Education under the Academy of Arts of Uzbekistan",
     'footer.copyright': '© 2026 Center for Retraining and Professional Development of Pedagogical and Specialist Personnel in Art Education under the Academy of Arts of Uzbekistan. All rights reserved.',
     'footer.address': 'Tashkent city, Uchtepa district, Shirin street 1a, Uzbekistan',
     'footer.phone': '+998 77 363-38-36',
