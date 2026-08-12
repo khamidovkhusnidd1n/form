@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export default function Button({
-  variant = 'primary', size = 'md', loading, icon, children, className, disabled, ...props
+  variant = 'primary', size = 'md', type = 'button', loading, icon, children, className, disabled, ...props
 }: ButtonProps) {
   const base = "inline-flex items-center justify-center gap-2 font-semibold rounded-[10px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed";
   const variants = {
@@ -26,6 +26,7 @@ export default function Button({
   };
   return (
     <button
+      type={type}
       {...props}
       disabled={disabled || loading}
       className={cn(base, variants[variant], sizes[size], className)}
