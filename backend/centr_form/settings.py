@@ -8,10 +8,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config('DEBUG', default=True, cast=bool)
 SECRET_KEY = config('SECRET_KEY', default=None)
 if not SECRET_KEY:
-    if DEBUG:
-        SECRET_KEY = 'django-insecure-dev-' + get_random_secret_key()
+    secret_path = BASE_DIR / '.secret_key'
+    if secret_path.exists():
+        with open(secret_path, 'r') as f:
+            SECRET_KEY = f.read().strip()
     else:
-        raise ValueError("SECRET_KEY environment variable MUST be defined in production!")
+        SECRET_KEY = 'django-insecure-dev-' + get_random_secret_key()
+        try:
+            with open(secret_path, 'w') as f:
+                f.write(SECRET_KEY)
+        except Exception:
+            pass
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
