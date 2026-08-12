@@ -21,5 +21,6 @@ from django.views.static import serve
 urlpatterns += [
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^assets/(?P<path>.*)$', serve, {'document_root': os.path.join(settings.BASE_DIR, '..', 'dist', 'assets')}),
+    re_path(r'^(?P<path>.*\.(png|jpg|jpeg|gif|ico|svg|webp|js|css|woff|woff2|ttf|eot))$', serve, {'document_root': os.path.join(settings.BASE_DIR, '..', 'dist')}),
     re_path(r'^(?!api/|media/|static/).*$', react_app_view),
 ]
