@@ -44,7 +44,7 @@ export default function LoginPage() {
         lastLogin: rawUser.last_login || rawUser.lastLogin,
       };
 
-      login(mappedUser, res.data.access);
+      login(mappedUser, res.data.access, res.data.refresh);
       toast.success(t('login.welcomeToast'));
       navigate('/admin');
     } catch (err: any) {
