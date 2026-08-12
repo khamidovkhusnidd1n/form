@@ -27,7 +27,7 @@ class EventListSerializer(serializers.ModelSerializer):
             'id', 'title', 'type', 'status', 'short_description', 'full_description',
             'start_date', 'end_date', 'registration_deadline', 'venue',
             'banner_url', 'registration_enabled', 'is_registration_open',
-            'participant_limit', 'applications_count', 'created_at',
+            'participant_limit', 'applications_count', 'created_at', 'translations',
         ]
 
     def get_banner_url(self, obj):
@@ -58,7 +58,17 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
             'title', 'type', 'status', 'short_description', 'full_description',
             'start_date', 'end_date', 'registration_deadline', 'venue',
             'banner', 'program_pdf', 'participant_limit', 'registration_enabled',
+            'translations',
         ]
+
+    def validate_translations(self, value):
+        if isinstance(value, str):
+            import json
+            try:
+                return json.loads(value)
+            except Exception:
+                pass
+        return value
 
     def validate(self, data):
         if data.get('start_date') and data.get('end_date'):
