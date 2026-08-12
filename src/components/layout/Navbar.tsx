@@ -25,20 +25,20 @@ export default function Navbar() {
     <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 shrink-0 max-w-[55%] lg:max-w-[45%]">
+          <Link to="/" className="flex items-center gap-2 flex-1 min-w-0 mr-2 lg:mr-4">
             <img src="/logo_v2.png" alt="Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0" />
             <div className="hidden sm:block min-w-0">
               <div className="text-[8px] sm:text-[9px] lg:text-[10px] font-semibold text-[#1a3b8b] leading-tight line-clamp-3">{t('brand.subtitle')}</div>
             </div>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1 shrink-0">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 className={cn(
-                  "px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                   location.pathname === link.to
                     ? "bg-[#e8f0fe] text-[#1a56db]"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-800"
