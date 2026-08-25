@@ -16,8 +16,14 @@ class Event(models.Model):
         ONGOING = 'ongoing', 'Jarayonda'
         COMPLETED = 'completed', 'Yakunlangan'
 
+    class Format(models.TextChoices):
+        ONLINE = 'online', 'Online'
+        OFFLINE = 'offline', 'Offline'
+        HYBRID = 'hybrid', 'Gibrid (Online/Offline)'
+
     title = models.CharField(max_length=500)
     type = models.CharField(max_length=20, choices=EventType.choices)
+    format = models.CharField(max_length=20, choices=Format.choices, default=Format.OFFLINE)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PLANNED)
     short_description = models.TextField()
     full_description = models.TextField()

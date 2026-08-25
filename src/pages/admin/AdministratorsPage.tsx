@@ -90,7 +90,17 @@ export default function AdministratorsPage() {
 
   const handleSave = async () => {
     if (!editing.username || !editing.fullName || !editing.email) {
-      toast.error(t('common.error') || 'Xatolik');
+      toast.error("Ism sharif, foydalanuvchi nomi va email to'ldirilishi shart");
+      return;
+    }
+
+    if (isNew && !editing.password) {
+      toast.error("Yangi foydalanuvchi uchun parol kiritilishi shart");
+      return;
+    }
+
+    if (isNew && editing.password && editing.password.length < 8) {
+      toast.error("Parol kamida 8 ta belgidan iborat bo'lishi kerak");
       return;
     }
     
@@ -114,8 +124,28 @@ export default function AdministratorsPage() {
       }
       setModalOpen(false);
       fetchUsers();
-    } catch (err) {
-      toast.error(t('common.error') || 'Xatolik');
+    } catch (err: any) {
+      const data = err?.response?.data;
+      if (data) {
+        // Backend validatsiya xatolarini ko'rsatish
+        const messages: string[] = [];
+        if (typeof data === 'object') {
+          Object.entries(data).forEach(([field, errors]) => {
+            if (Array.isArray(errors)) {
+              messages.push(...errors.map(String));
+            } else if (typeof errors === 'string') {
+              messages.push(errors);
+            }
+          });
+        }
+        if (messages.length > 0) {
+          toast.error(messages.join('\n'));
+        } else {
+          toast.error(t('common.error') || 'Xatolik yuz berdi');
+        }
+      } else {
+        toast.error(t('common.error') || 'Xatolik yuz berdi');
+      }
     } finally {
       setSaving(false);
     }
@@ -189,7 +219,7 @@ export default function AdministratorsPage() {
             { label: t('admins.fullNameLabel'), key: "fullName", placeholder: "To'liq ism", type: "text" },
             { label: t('admins.usernameLabel'), key: "username", placeholder: "username", type: "text" },
             { label: t('admins.emailLabel'), key: "email", placeholder: "email@akademiya.uz", type: "email" },
-            ...(isNew ? [{ label: t('admins.passwordLabel'), key: "password", placeholder: "••••••••", type: "password" }] : []),
+            ...(isNew ? [{ label: t('admins.passwordLabel'), key: "password", placeholder: "Kamida 8 ta belgi", type: "password" }] : []),
           ].map(({ label, key, placeholder, type }) => (
             <div key={key}>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>
@@ -197,9 +227,13 @@ export default function AdministratorsPage() {
                 value={(editing as Record<string, string>)[key] || ''}
                 onChange={(e) => setEditing(ed => ({ ...ed, [key]: e.target.value }))}
                 type={type}
+                minLength={key === 'password' ? 8 : undefined}
                 className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a56db]/30"
                 placeholder={placeholder}
               />
+              {key === 'password' && isNew && (
+                <p className="text-xs text-slate-400 mt-1">Kamida 8 ta belgi kiritilishi shart</p>
+              )}
             </div>
           ))}
           <div>

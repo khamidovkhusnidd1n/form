@@ -5,15 +5,22 @@ import Card from '../../components/ui/Card';
 import Modal from '../../components/ui/Modal';
 import { EventStatusBadge, EventTypeBadge } from '../../components/ui/Badge';
 import { formatDate, EVENT_TYPE_LABELS, EVENT_STATUS_LABELS } from '../../lib/utils';
-import type { Event, EventType, EventStatus } from '../../types';
+import type { Event, EventType, EventFormat, EventStatus } from '../../types';
 import toast from 'react-hot-toast';
 import { useTranslation, LANGUAGE_LABELS, type Language } from '../../i18n';
 import { useData } from '../../store/dataStore';
 import { translateContentToAllLanguages, getTranslatedContent } from '../../lib/translationService';
 
+const EVENT_FORMAT_LABELS: Record<string, Record<string, string>> = {
+  uz: { online: 'Online', offline: 'Offline', hybrid: 'Gibrid (Online/Offline)' },
+  ru: { online: 'Онлайн', offline: 'Офлайн', hybrid: 'Гибрид (Онлайн/Офлайн)' },
+  en: { online: 'Online', offline: 'Offline', hybrid: 'Hybrid (Online/Offline)' },
+};
+
 const EMPTY_EVENT: Partial<Event> = {
   title: '',
   type: 'conference',
+  format: 'offline',
   status: 'planned',
   shortDescription: '',
   fullDescription: '',
@@ -281,6 +288,19 @@ export default function EventsAdminPage() {
                 className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#1a56db]/30"
               >
                 {Object.entries(EVENT_STATUS_LABELS[language] || EVENT_STATUS_LABELS.uz).map(([v, l]) => (
+                  <option key={v} value={v}>{l}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Format</label>
+              <select
+                value={(editing.format as string) || 'offline'}
+                onChange={(e) => setEditing(ed => ({ ...ed, format: e.target.value as EventFormat }))}
+                className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#1a56db]/30"
+              >
+                {Object.entries(EVENT_FORMAT_LABELS[language] || EVENT_FORMAT_LABELS.uz).map(([v, l]) => (
                   <option key={v} value={v}>{l}</option>
                 ))}
               </select>

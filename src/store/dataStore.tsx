@@ -37,6 +37,7 @@ export function transformEvent(item: any): Event {
     id: Number(item.id),
     title: item.title || '',
     type: item.type || 'conference',
+    format: item.format || 'offline',
     status: item.status || 'planned',
     shortDescription: item.short_description ?? item.shortDescription ?? '',
     fullDescription: item.full_description ?? item.fullDescription ?? '',
@@ -101,6 +102,7 @@ export function transformApplication(item: any): Application {
     passportUrl: item.passport_url ?? item.passportUrl,
     passportSeriesNumber: passportSeriesVal,
     photoUrl: item.photo_url ?? item.photoUrl,
+    attendanceType: item.attendance_type ?? item.attendanceType ?? 'offline',
     status: item.status || 'submitted',
     adminComment: item.admin_comment ?? item.adminComment,
     invitationPdfUrl: item.invitation_pdf_url ?? item.invitationPdfUrl,
@@ -220,6 +222,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const formData = new FormData();
       formData.append('title', e.title);
       formData.append('type', e.type);
+      formData.append('format', e.format);
       formData.append('status', e.status);
       formData.append('short_description', e.shortDescription);
       formData.append('full_description', e.fullDescription);
@@ -247,6 +250,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const formData = new FormData();
       formData.append('title', e.title);
       formData.append('type', e.type);
+      formData.append('format', e.format);
       formData.append('status', e.status);
       formData.append('short_description', e.shortDescription);
       formData.append('full_description', e.fullDescription);
@@ -330,6 +334,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     const formData = new FormData();
     formData.append('event', String(app.eventId));
+    formData.append('attendance_type', app.attendanceType || 'offline');
     formData.append('full_name', app.fullName);
     formData.append('date_of_birth', app.dateOfBirth);
     formData.append('gender', app.gender);

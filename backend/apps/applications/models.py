@@ -29,6 +29,12 @@ class Application(models.Model):
 
     application_id = models.CharField(max_length=20, unique=True, default=generate_application_id, editable=False)
     event = models.ForeignKey(Event, on_delete=models.PROTECT, related_name='applications')
+    
+    class AttendanceType(models.TextChoices):
+        ONLINE = 'online', 'Online'
+        OFFLINE = 'offline', 'Offline'
+        
+    attendance_type = models.CharField(max_length=20, choices=AttendanceType.choices, default=AttendanceType.OFFLINE)
 
     # Personal info
     full_name = models.CharField(max_length=300)

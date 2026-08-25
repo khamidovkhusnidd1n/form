@@ -30,7 +30,7 @@ class ApplicationSubmitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
         fields = [
-            'application_id', 'event', 'full_name', 'date_of_birth', 'gender', 'phone', 'email',
+            'application_id', 'event', 'attendance_type', 'full_name', 'date_of_birth', 'gender', 'phone', 'email',
             'organization', 'position', 'country', 'region', 'district',
             'presentation_title', 'abstract', 'document', 'passport', 'photo',
         ]
@@ -52,6 +52,21 @@ class ApplicationSubmitSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         event = data.get('event')
+        attendance_type = data.get('attendance_type')
+
+        # Validate attendance_type against event format
+        if event and attendance_type:
+            event_format = event.format  # 'online', 'offline', or 'hybrid'
+            if event_format == 'online' and attendance_type == 'offline':
+                raise serializers.ValidationError(
+                    {"attendance_type": "Bu tadbir faqat Online formatda o'tkaziladi. Offline qatnashish mumkin emas."}
+                )
+            elif event_format == 'offline' and attendance_type == 'online':
+                raise serializers.ValidationError(
+                    {"attendance_type": "Bu tadbir faqat Offline (jismoniy) formatda o'tkaziladi. Online qatnashish mumkin emas."}
+                )
+            # hybrid allows both online and offline
+
         try:
             ApplicationService.validate_submission(event, data)
         except ValueError as exc:
@@ -66,7 +81,7 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
         model = Application
         fields = [
             'application_id', 'full_name', 'email', 'organization', 'position',
-            'country', 'region', 'district', 'event_title', 'presentation_title', 'abstract',
+            'country', 'region', 'district', 'event_title', 'attendance_type', 'presentation_title', 'abstract',
             'status', 'admin_comment', 'translations', 'submitted_at', 'updated_at',
             'invitation_pdf', 'certificate_pdf',
         ]

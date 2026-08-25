@@ -27,6 +27,7 @@ export default function ApplicationFormPage() {
   const [successId, setSuccessId] = useState<string | null>(null);
   const [selectedRegionId, setSelectedRegionId] = useState('');
   const [files, setFiles] = useState<{ document?: File; passport?: File; photo?: File }>({});
+  const [attendanceType, setAttendanceType] = useState<'online' | 'offline'>('offline');
 
   const localizedRegions = useMemo(() => getLocalizedRegions(language), [language]);
 
@@ -126,6 +127,7 @@ export default function ApplicationFormPage() {
       districtName: selectedDist || data.districtId,
       eventId: Number(data.eventId),
       eventTitle: translatedEvt?.title || selectedEvt?.title || '',
+      attendanceType: attendanceType,
       presentationTitle: data.presentationTitle,
       abstract: data.abstract,
       status: 'submitted',
@@ -140,8 +142,17 @@ export default function ApplicationFormPage() {
       const realId = await addApplication(newApp);
       setSuccessId((realId as unknown as string) || id);
       toast.success(t('common.success'));
-    } catch (e) {
-      toast.error(t('common.error') || 'Xatolik yuz berdi');
+    } catch (e: any) {
+      // Show detailed backend error if available
+      const data = e?.response?.data;
+      if (data) {
+        const messages = Object.entries(data)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+          .join(' | ');
+        toast.error(messages || t('common.error') || 'Xatolik yuz berdi', { duration: 6000 });
+      } else {
+        toast.error(t('common.error') || 'Xatolik yuz berdi');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -304,6 +315,58 @@ export default function ApplicationFormPage() {
                     }
                     required
                   />
+
+                  {/* Attendance Type - Show only for hybrid events; auto-set for online/offline only */}
+                  {(() => {
+                    const selectedEvtId = watch('eventId');
+                    const selectedEvt = events.find(e => e.id.toString() === selectedEvtId);
+                    if (!selectedEvt) return null;
+
+                    // Auto-set attendanceType for non-hybrid events
+                    if (selectedEvt.format !== 'hybrid' && attendanceType !== selectedEvt.format) {
+                      setAttendanceType(selectedEvt.format as 'online' | 'offline');
+                    }
+
+                    if (selectedEvt.format === 'hybrid') {
+                      return (
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">Ishtirok etish usuli *</label>
+                          <div className="grid grid-cols-2 gap-3">
+                            {[
+                              { value: 'offline' as const, label: 'Offline (Jismoniy)', icon: '🏢', desc: 'Joyiga kelib qatnashish' },
+                              { value: 'online' as const, label: 'Online', icon: '💻', desc: 'Masofaviy qatnashish' },
+                            ].map(opt => (
+                              <button
+                                key={opt.value}
+                                type="button"
+                                onClick={() => setAttendanceType(opt.value)}
+                                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                                  attendanceType === opt.value
+                                    ? 'border-[#1a56db] bg-[#e8f0fe]/40 shadow-sm'
+                                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                                }`}
+                              >
+                                <span className="text-2xl">{opt.icon}</span>
+                                <span className={`text-sm font-semibold ${attendanceType === opt.value ? 'text-[#1a56db]' : 'text-slate-700'}`}>{opt.label}</span>
+                                <span className="text-xs text-slate-400">{opt.desc}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // For online-only or offline-only events, show info badge (attendanceType already auto-set above)
+                    return (
+                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <span className="text-lg">{selectedEvt.format === 'online' ? '💻' : '🏢'}</span>
+                        <span className="text-sm text-slate-600">
+                          Bu tadbir faqat <strong>{selectedEvt.format === 'online' ? 'Online' : 'Offline'}</strong> formatda o'tkaziladi
+                        </span>
+                      </div>
+                    );
+                  })()}
+
                   <Input label={t('apply.presentationTitle')} {...register('presentationTitle')} error={errors.presentationTitle?.message} placeholder={t('apply.presentationTitlePlaceholder')} required />
                   <Textarea
                     label={t('apply.abstract')}

@@ -1,6 +1,8 @@
-export type EventType = 'conference' | 'forum' | 'exhibition' | 'symposium' | 'workshop' | 'seminar';
+export type EventType = 'conference' | 'forum' | 'exhibition' | 'symposium' | 'workshop' | 'seminar' | 'article_call';
+export type EventFormat = 'online' | 'offline' | 'hybrid';
 export type EventStatus = 'planned' | 'ongoing' | 'completed';
 export type ApplicationStatus = 'submitted' | 'under_review' | 'info_required' | 'approved' | 'rejected';
+export type AttendanceType = 'online' | 'offline';
 export type UserRole = 'super_admin' | 'administrator' | 'moderator';
 export type Gender = 'male' | 'female';
 export type FieldType = 'text' | 'textarea' | 'select' | 'checkbox' | 'radio' | 'date' | 'number' | 'email' | 'phone' | 'file' | 'image' | 'pdf';
@@ -19,6 +21,7 @@ export interface Event {
   id: number;
   title: string;
   type: EventType;
+  format: EventFormat;
   status: EventStatus;
   shortDescription: string;
   fullDescription: string;
@@ -56,6 +59,7 @@ export interface Application {
   districtName: string;
   eventId: number;
   eventTitle: string;
+  attendanceType: AttendanceType;
   presentationTitle: string;
   abstract: string;
   documentUrl?: string;
@@ -128,6 +132,7 @@ export interface ApplicationFormData {
   regionId: string;
   districtId: string;
   eventId: string;
+  attendanceType: AttendanceType;
   presentationTitle: string;
   abstract: string;
   document?: FileList;

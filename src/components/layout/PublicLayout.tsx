@@ -5,11 +5,11 @@ import ToastProvider from '../ui/Toast';
 
 export default function PublicLayout() {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <ToastProvider />
       <Navbar />
-      <main><Outlet /></main>
+      <main className="flex-1"><Outlet /></main>
       <Footer />
-    </>
+    </div>
   );
 }

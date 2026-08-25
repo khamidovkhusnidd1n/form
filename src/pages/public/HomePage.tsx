@@ -137,12 +137,12 @@ export default function HomePage() {
       {/* Active Events */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <h2 className="font-display text-3xl font-bold text-slate-800 mb-2">{t('home.activeEventsTitle')}</h2>
-              <p className="text-slate-500">{t('home.activeEventsSubtitle')}</p>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+            <div className="flex-1">
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-800 mb-2">{t('home.activeEventsTitle')}</h2>
+              <p className="text-slate-500 text-sm sm:text-base">{t('home.activeEventsSubtitle')}</p>
             </div>
-            <Link to="/events" className="flex items-center gap-1 text-[#1a56db] text-sm font-medium hover:gap-2 transition-all">
+            <Link to="/events" className="flex items-center gap-1 text-[#1a56db] text-sm font-medium hover:gap-2 transition-all whitespace-nowrap">
               {t('home.viewAll')} <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -159,7 +159,7 @@ export default function HomePage() {
                   <div className="relative h-44 bg-slate-200 overflow-hidden">
                     <img src={event.bannerUrl} alt={event.title} className="w-full h-full object-cover" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <div className="absolute top-3 left-3 flex gap-2">
+                    <div className="absolute top-3 left-3 flex flex-wrap gap-2 pr-3">
                       <EventStatusBadge status={event.status} />
                       <EventTypeBadge type={event.type} />
                     </div>
@@ -191,7 +191,7 @@ export default function HomePage() {
             <h2 className="font-display text-3xl font-bold text-slate-800 mb-3">{t('home.howItWorks')}</h2>
             <p className="text-slate-500 max-w-xl mx-auto">{t('home.howItWorksSubtitle')}</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { step: "01", icon: Calendar, title: t('home.step1Title'), desc: t('home.step1Desc') },
               { step: "02", icon: FileText, title: t('home.step2Title'), desc: t('home.step2Desc') },

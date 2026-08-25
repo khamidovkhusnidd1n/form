@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, MapPin, Users, Clock, ArrowRight, Download, ChevronLeft } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, ArrowRight, Download, ChevronLeft, Monitor, Building2, Layers } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { EventStatusBadge, EventTypeBadge } from '../../components/ui/Badge';
 import { formatDate } from '../../lib/utils';
@@ -42,6 +42,16 @@ export default function EventDetailPage() {
             <div className="flex flex-wrap gap-2 mb-3">
               <EventTypeBadge type={event.type} />
               <EventStatusBadge status={event.status} />
+              {event.format && (
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                  event.format === 'online' ? 'bg-emerald-500/20 text-emerald-200' :
+                  event.format === 'hybrid' ? 'bg-purple-500/20 text-purple-200' :
+                  'bg-blue-500/20 text-blue-200'
+                }`}>
+                  {event.format === 'online' ? <Monitor className="w-3 h-3" /> : event.format === 'hybrid' ? <Layers className="w-3 h-3" /> : <Building2 className="w-3 h-3" />}
+                  {event.format === 'online' ? 'Online' : event.format === 'hybrid' ? 'Gibrid' : 'Offline'}
+                </span>
+              )}
             </div>
             <h1 className="font-display text-3xl md:text-4xl font-bold text-white leading-tight max-w-3xl">{event.title}</h1>
           </div>

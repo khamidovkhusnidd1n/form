@@ -352,6 +352,7 @@ export default function ApplicationsPage() {
                 [t('apply.region'), selected.regionName],
                 [t('apply.district'), selected.districtName],
                 [t('apply.event'), selected.eventTitle],
+                ['Qatnashish turi', selected.attendanceType === 'online' ? 'Online' : 'Offline'],
                 [t('apply.presentationTitle'), selected.presentationTitle],
                 [t('track.submittedDate'), formatDate(selected.submittedAt, language)],
               ] as [string, string][]).map(([k, v]) => (
