@@ -167,7 +167,8 @@ export default function EventsAdminPage() {
       </div>
 
       <Card className="overflow-hidden p-0">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm whitespace-nowrap">
           <thead className="bg-slate-50 border-b border-slate-100">
             <tr>
               {[
@@ -213,7 +214,8 @@ export default function EventsAdminPage() {
               );
             })}
           </tbody>
-        </table>
+          </table>
+        </div>
       </Card>
 
       {/* Create/Edit Modal */}
