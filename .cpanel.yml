@@ -1,9 +1,14 @@
 ---
 deployment:
   tasks:
-    # Bu yerdagi /home/USERNAME/public_html qismini o'zingizning haqiqiy cPanel login va papkangizga almashtiring!
-    # Masalan: /home/ahost123/public_html yoki /home/ahost123/saytim.uz
-    - export DEPLOYPATH=/home/uzbamala/form.uzbamalaka.uz
+    # 1. Frontend fayllarni nusxalash
+    - export FRONTEND_PATH=/home/uzbamala/form.uzbamalaka.uz
+    - /bin/cp -R dist/* $FRONTEND_PATH/
     
-    # Biz faqat 'dist' (tayyor build qilingan frontend) papkasini serverga nusxalaymiz
-    - /bin/cp -R dist/* $DEPLOYPATH
+    # 2. Backend fayllarni nusxalash
+    - export BACKEND_PATH=/home/uzbamala/form.uzbamalaka.uz/backend
+    - /bin/cp -R backend/* $BACKEND_PATH/
+    
+    # 3. Backend (Python/Django) ilovasini qayta ishga tushirish (restart)
+    - mkdir -p $BACKEND_PATH/tmp
+    - touch $BACKEND_PATH/tmp/restart.txt
