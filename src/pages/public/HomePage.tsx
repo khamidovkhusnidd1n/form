@@ -64,10 +64,7 @@ export default function HomePage() {
             transition={{ duration: 0.7 }}
             className="max-w-4xl"
           >
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm font-medium mb-6">
-              <Star className="w-4 h-4 text-[#fbbf24]" />
-              {t('home.badge')}
-            </div>
+
 
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               {t('home.titleLine1')}{' '}
