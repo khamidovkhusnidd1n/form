@@ -415,7 +415,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const deleteMultipleApplications = async (ids: number[]) => {
     setApplications((prev) => prev.filter((item) => !ids.includes(item.id)));
     try {
-      await apiClient.delete(`/applications/admin/bulk-delete/`, { data: { ids } });
+      await apiClient.post(`/applications/admin/bulk-delete/`, { ids });
     } catch (err) {
       console.error('Failed to bulk delete applications', err);
       throw err;

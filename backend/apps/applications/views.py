@@ -99,7 +99,7 @@ def update_application_status(request, pk):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
+@api_view(['DELETE', 'POST'])
 @permission_classes([IsModeratorOrAbove])
 def bulk_delete_applications(request):
     ids = request.data.get('ids', [])
