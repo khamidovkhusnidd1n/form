@@ -110,6 +110,34 @@ def bulk_delete_applications(request):
     return Response({'detail': f"{deleted_count} ta ariza muvaffaqiyatli o'chirildi."})
 
 
+@api_view(['POST'])
+@permission_classes([IsModeratorOrAbove])
+def bulk_status_applications(request):
+    ids = request.data.get('ids', [])
+    new_status = request.data.get('status')
+    admin_comment = request.data.get('comment', '')
+
+    if not isinstance(ids, list) or not ids:
+        return Response({'detail': "Iltimos, arizalarni tanlang."}, status=status.HTTP_400_BAD_REQUEST)
+    if not new_status:
+        return Response({'detail': "Status tanlanmadi."}, status=status.HTTP_400_BAD_REQUEST)
+
+    applications = Application.objects.filter(id__in=ids)
+    updated_count = 0
+    actor = getattr(request.user, 'username', 'admin')
+
+    for app in applications:
+        ApplicationService.update_status(
+            app,
+            new_status,
+            admin_comment,
+            actor=actor
+        )
+        updated_count += 1
+
+    return Response({'detail': f"{updated_count} ta arizaning holati muvaffaqiyatli o'zgartirildi."})
+
+
 @api_view(['GET'])
 @permission_classes([IsAdminOrAbove])
 def export_applications_excel(request):

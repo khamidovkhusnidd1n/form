@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', views.AdminApplicationListView.as_view(), name='admin_applications'),
     path('admin/export/excel/', views.export_applications_excel, name='export_excel'),
     path('admin/bulk-delete/', views.bulk_delete_applications, name='bulk_delete_applications'),
+    path('admin/bulk-status/', views.bulk_status_applications, name='bulk_status_applications'),
     path('admin/<int:pk>/', views.AdminApplicationDetailView.as_view(), name='admin_application_detail'),
     path('admin/<int:pk>/status/', views.update_application_status, name='update_status'),
 ]

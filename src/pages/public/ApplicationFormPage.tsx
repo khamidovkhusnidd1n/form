@@ -25,9 +25,19 @@ export default function ApplicationFormPage() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
-  const [selectedRegionId, setSelectedRegionId] = useState('');
+  const [selectedRegionId, setSelectedRegionId] = useState<string>('');
   const [files, setFiles] = useState<{ document?: File; passport?: File; photo?: File }>({});
   const [attendanceType, setAttendanceType] = useState<'online' | 'offline'>('offline');
+
+  const [captchaNum1, setCaptchaNum1] = useState(0);
+  const [captchaNum2, setCaptchaNum2] = useState(0);
+  const [captchaInput, setCaptchaInput] = useState('');
+  const [captchaError, setCaptchaError] = useState(false);
+
+  useEffect(() => {
+    setCaptchaNum1(Math.floor(Math.random() * 10) + 1);
+    setCaptchaNum2(Math.floor(Math.random() * 10) + 1);
+  }, []);
 
   const localizedRegions = useMemo(() => getLocalizedRegions(language), [language]);
 
@@ -97,6 +107,13 @@ export default function ApplicationFormPage() {
   };
 
   const onSubmit = async (data: FormData) => {
+    if (parseInt(captchaInput) !== (captchaNum1 + captchaNum2)) {
+      setCaptchaError(true);
+      toast.error(t('apply.captchaError') || "Xavfsizlik savoliga noto'g'ri javob berdingiz.");
+      return;
+    }
+    setCaptchaError(false);
+
     if (!files.document) {
       toast.error(t('apply.fileRequired') || "Tezis (Abstract) yuklanishi shart (PDF, DOCX)");
       return;
@@ -426,6 +443,25 @@ export default function ApplicationFormPage() {
                   ))}
                   <div className="bg-blue-50 rounded-xl p-4 text-sm text-blue-700 border border-blue-100">
                     {t('apply.attentionNotice')}
+                  </div>
+                  
+                  {/* Math Captcha */}
+                  <div className={`p-4 rounded-xl border ${captchaError ? 'border-red-300 bg-red-50' : 'border-slate-200 bg-slate-50'}`}>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Spamdan himoya: {captchaNum1} + {captchaNum2} = ?
+                    </label>
+                    <input
+                      type="number"
+                      value={captchaInput}
+                      onChange={(e) => {
+                        setCaptchaInput(e.target.value);
+                        setCaptchaError(false);
+                      }}
+                      className={`w-full max-w-[200px] border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ${captchaError ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-300 focus:border-[#1a56db] focus:ring-[#1a56db]/30'}`}
+                      placeholder="Javobni kiriting"
+                      required
+                    />
+                    {captchaError && <p className="text-xs text-red-500 mt-1">Javob noto'g'ri!</p>}
                   </div>
                 </motion.div>
               )}

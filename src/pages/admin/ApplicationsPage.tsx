@@ -16,13 +16,14 @@ const PAGE_SIZE = 8;
 
 export default function ApplicationsPage() {
   const { t, language } = useTranslation();
-  const { applications, updateApplication, deleteApplication, deleteMultipleApplications } = useData();
+  const { applications, updateApplication, deleteApplication, deleteMultipleApplications, updateMultipleApplicationsStatus } = useData();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | 'all'>('all');
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Application | null>(null);
   const [statusModal, setStatusModal] = useState<Application | null>(null);
+  const [bulkStatusModal, setBulkStatusModal] = useState(false);
   const [newStatus, setNewStatus] = useState<ApplicationStatus>('submitted');
   const [commentTranslations, setCommentTranslations] = useState<Record<Language, string>>({ uz: '', ru: '', en: '' });
   const [activeTabLang, setActiveTabLang] = useState<Language>('uz');
@@ -112,6 +113,22 @@ export default function ApplicationsPage() {
     setSavingStatus(false);
   };
 
+  const handleBulkStatusChange = async () => {
+    if (selectedIds.size === 0 || !updateMultipleApplicationsStatus) return;
+    setSavingStatus(true);
+    try {
+      await updateMultipleApplicationsStatus(Array.from(selectedIds), newStatus, commentTranslations.uz);
+      toast.success(t('common.success') || 'Status o\'zgartirildi');
+      setSelectedIds(new Set());
+      setBulkStatusModal(false);
+      setCommentTranslations({ uz: '', ru: '', en: '' });
+    } catch (err) {
+      toast.error(t('common.error') || 'Xatolik yuz berdi');
+    } finally {
+      setSavingStatus(false);
+    }
+  };
+
   const handleExportExcel = () => {
     const exportData = filtered.map(app => ({
       'ID': app.applicationId,
@@ -170,14 +187,24 @@ export default function ApplicationsPage() {
         </div>
         <div className="flex items-center gap-4">
           {selectedIds.size > 0 && (
-            <Button
-              variant="secondary"
-              className="!bg-red-50 !text-red-600 hover:!bg-red-100 border-none"
-              onClick={() => setDeleteConfirmModal({ type: 'multiple' })}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              {t('common.deleteSelected') || 'Tanlanganlarni o\'chirish'} ({selectedIds.size})
-            </Button>
+            <>
+              <Button
+                variant="secondary"
+                className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-none"
+                onClick={() => { setBulkStatusModal(true); setNewStatus('submitted'); }}
+              >
+                <Edit2 className="w-4 h-4 mr-2" />
+                Statusni o'zgartirish ({selectedIds.size})
+              </Button>
+              <Button
+                variant="secondary"
+                className="!bg-red-50 !text-red-600 hover:!bg-red-100 border-none"
+                onClick={() => setDeleteConfirmModal({ type: 'multiple' })}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                {t('common.deleteSelected') || 'Tanlanganlarni o\'chirish'}
+              </Button>
+            </>
           )}
           <Button variant="outline" className="hidden sm:flex bg-white" onClick={handleExportExcel}>
             <Download className="w-4 h-4 mr-2" />
@@ -467,6 +494,41 @@ export default function ApplicationsPage() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Bulk Status Change Modal */}
+      <Modal open={bulkStatusModal} onClose={() => setBulkStatusModal(false)} title="Statusni o'zgartirish" size="sm">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600">Tanlangan arizalar soni: {selectedIds.size} ta</p>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">{t('appsAdmin.newStatusLabel')}</label>
+            <select
+              value={newStatus}
+              onChange={(e) => setNewStatus(e.target.value as ApplicationStatus)}
+              className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a56db]/30"
+            >
+              {Object.entries(APPLICATION_STATUS_LABELS[language] || APPLICATION_STATUS_LABELS.uz).map(([v, l]) => (
+                <option key={v} value={v}>{l}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Izoh (ixtiyoriy)</label>
+            <textarea
+              value={commentTranslations.uz}
+              onChange={(e) => setCommentTranslations({ ...commentTranslations, uz: e.target.value })}
+              rows={3}
+              placeholder="Izoh yozing..."
+              className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a56db]/30 resize-none"
+            />
+          </div>
+          <div className="flex gap-3">
+            <Button onClick={handleBulkStatusChange} loading={savingStatus} className="flex-1 justify-center" icon={<CheckCircle className="w-4 h-4" />}>
+              {t('common.save')}
+            </Button>
+            <Button variant="ghost" onClick={() => setBulkStatusModal(false)} className="flex-1 justify-center">{t('common.cancel')}</Button>
+          </div>
+        </div>
       </Modal>
 
       {/* Delete Confirmation Modal */}

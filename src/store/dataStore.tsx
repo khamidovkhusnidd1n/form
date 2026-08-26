@@ -130,6 +130,7 @@ interface DataContextType {
   updateApplicationStatus?: (appId: number | string, status: string, adminComment?: string, customTranslations?: Record<string, any>) => Promise<void> | void;
   deleteApplication?: (id: number) => Promise<void>;
   deleteMultipleApplications?: (ids: number[]) => Promise<void>;
+  updateMultipleApplicationsStatus?: (ids: number[], status: string, comment: string) => Promise<void>;
   fetchEvents?: () => Promise<void>;
   fetchFaqs?: () => Promise<void>;
   fetchApplications?: () => Promise<void>;
@@ -421,6 +422,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateMultipleApplicationsStatus = async (ids: number[], newStatus: string, adminComment: string = '') => {
+    setApplications((prev) => prev.map((item) => 
+      ids.includes(item.id) ? { ...item, status: newStatus as any, adminComment } : item
+    ));
+    try {
+      await apiClient.post(`/applications/admin/bulk-status/`, { ids, status: newStatus, comment: adminComment });
+    } catch (err) {
+      console.error('Failed to bulk update status', err);
+      throw err;
+    }
+  };
+
   const updateApplication = async (app: Application) => {
     setApplications((prev) => prev.map((item) => (item.id === app.id ? app : item)));
 
@@ -461,6 +474,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         updateApplicationStatus,
         deleteApplication,
         deleteMultipleApplications,
+        updateMultipleApplicationsStatus,
         fetchEvents,
         fetchFaqs,
         fetchApplications,
