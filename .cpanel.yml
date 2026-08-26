@@ -1,14 +1,9 @@
 ---
 deployment:
   tasks:
-    # 1. Frontend fayllarni nusxalash
-    - export FRONTEND_PATH=/home/uzbamala/form.uzbamalaka.uz
-    - /bin/cp -R dist/* $FRONTEND_PATH/
-    
-    # 2. Backend fayllarni nusxalash
-    - export BACKEND_PATH=/home/uzbamala/form.uzbamalaka.uz/backend
-    - /bin/cp -R backend/* $BACKEND_PATH/
-    
-    # 3. Backend (Python/Django) ilovasini qayta ishga tushirish (restart)
-    - mkdir -p $BACKEND_PATH/tmp
-    - touch $BACKEND_PATH/tmp/restart.txt
+    - export DEPLOYPATH=/home/uzbamala/form.uzbamalaka.uz
+    - /bin/cp -R dist/* $DEPLOYPATH/
+    - export BACKENDPATH=/home/uzbamala/form.uzbamalaka.uz/backend
+    - /bin/cp -R backend/* $BACKENDPATH/
+    - mkdir -p $BACKENDPATH/tmp
+    - touch $BACKENDPATH/tmp/restart.txt
