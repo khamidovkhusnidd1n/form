@@ -51,8 +51,8 @@ class Application(models.Model):
     district = models.CharField(max_length=100)
 
     # Presentation
-    presentation_title = models.CharField(max_length=500)
-    abstract = models.TextField()
+    presentation_title = models.CharField(max_length=500, null=True, blank=True)
+    abstract = models.TextField(null=True, blank=True)
 
     # Files
     document = models.FileField(upload_to='applications/documents/', null=True, blank=True)

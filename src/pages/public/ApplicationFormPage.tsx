@@ -53,8 +53,8 @@ export default function ApplicationFormPage() {
     regionId: z.string().min(1, t('val.region')),
     districtId: z.string().min(1, t('val.district')),
     eventId: z.string().min(1, t('val.event')),
-    presentationTitle: z.string().min(5, t('val.presentationTitle')),
-    abstract: z.string().min(50, t('val.abstract')),
+    presentationTitle: z.string().optional(),
+      abstract: z.string().optional(),
   }), [t]);
 
   type FormData = z.infer<typeof schema>;
@@ -103,6 +103,22 @@ export default function ApplicationFormPage() {
 
   const nextStep = async () => {
     const valid = await trigger(stepFields[step]);
+    
+    if (step === 3 && valid) {
+      const selectedEvtId = watch('eventId');
+      const currentEvt = events.find(e => e.id.toString() === selectedEvtId);
+      const requiresDocument = ['conference', 'symposium', 'article_call'].includes(currentEvt?.type || '');
+      
+      if (requiresDocument) {
+        const pTitle = watch('presentationTitle');
+        const abst = watch('abstract');
+        if (!pTitle || pTitle.length < 5 || !abst || abst.length < 50) {
+          toast.error(t('val.presentationTitle') || 'Iltimos, ma\'ruza mavzusi va qisqacha mazmunini to\'liq kiriting.');
+          return;
+        }
+      }
+    }
+    
     if (valid) setStep(s => Math.min(s + 1, 4));
   };
 
@@ -114,7 +130,11 @@ export default function ApplicationFormPage() {
     }
     setCaptchaError(false);
 
-    if (!files.document) {
+    const selectedEvtId = data.eventId;
+    const currentEvt = events.find(e => e.id.toString() === selectedEvtId);
+    const requiresDocument = ['conference', 'symposium', 'article_call'].includes(currentEvt?.type || '');
+
+    if (requiresDocument && !files.document) {
       toast.error(t('apply.fileRequired') || "Tezis (Abstract) yuklanishi shart (PDF, DOCX)");
       return;
     }
@@ -383,16 +403,28 @@ export default function ApplicationFormPage() {
                     );
                   })()}
 
-                  <Input label={t('apply.presentationTitle')} {...register('presentationTitle')} error={errors.presentationTitle?.message} placeholder={t('apply.presentationTitlePlaceholder')} required />
-                  <Textarea
-                    label={t('apply.abstract')}
-                    {...register('abstract')}
-                    error={errors.abstract?.message}
-                    rows={6}
-                    placeholder={t('apply.abstractPlaceholder')}
-                    hint={t('apply.abstractHint')}
-                    required
-                  />
+                  {(() => {
+                    const selectedEvtId = watch('eventId');
+                    const selectedEvt = events.find(e => e.id.toString() === selectedEvtId);
+                    const requiresDocument = ['conference', 'symposium', 'article_call'].includes(selectedEvt?.type || '');
+                    
+                    if (!requiresDocument) return null;
+                    
+                    return (
+                      <>
+                        <Input label={t('apply.presentationTitle')} {...register('presentationTitle')} error={errors.presentationTitle?.message} placeholder={t('apply.presentationTitlePlaceholder')} required />
+                        <Textarea
+                          label={t('apply.abstract')}
+                          {...register('abstract')}
+                          error={errors.abstract?.message}
+                          rows={6}
+                          placeholder={t('apply.abstractPlaceholder')}
+                          hint={t('apply.abstractHint')}
+                          required
+                        />
+                      </>
+                    );
+                  })()}
                 </motion.div>
               )}
 

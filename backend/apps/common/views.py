@@ -168,3 +168,23 @@ def run_migrations_view(request):
             'error': str(e),
             'traceback': traceback.format_exc()
         }, status=500)
+
+@require_http_methods(["GET"])
+def run_makemigrations_view(request):
+    """View to run makemigrations from web."""
+    try:
+        from django.core.management import call_command
+        import io
+        out = io.StringIO()
+        call_command('makemigrations', interactive=False, stdout=out)
+        return JsonResponse({
+            'status': 'success',
+            'output': out.getvalue()
+        }, status=200)
+    except Exception as e:
+        import traceback
+        return JsonResponse({
+            'status': 'error',
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }, status=500)
