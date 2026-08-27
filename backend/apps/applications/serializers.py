@@ -4,7 +4,7 @@ from .models import Application
 from .services import ApplicationService
 
 MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
-ALLOWED_FILE_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.png'}
+ALLOWED_FILE_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'}
 
 
 def validate_uploaded_file(file_obj, allowed_extensions=ALLOWED_FILE_EXTENSIONS, max_size_bytes=MAX_FILE_SIZE_BYTES):
