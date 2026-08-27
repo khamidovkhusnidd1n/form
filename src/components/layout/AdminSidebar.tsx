@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, Calendar, HelpCircle, Users, LogOut, GraduationCap, ChevronRight, Settings } from 'lucide-react';
+import { LayoutDashboard, FileText, Calendar, HelpCircle, Users, LogOut, GraduationCap, ChevronRight, Settings, Sparkles } from 'lucide-react';
 import { cn, getRoleLabel } from '../../lib/utils';
 import { useAuth } from '../../store/authStore';
 import { useTranslation } from '../../i18n';
@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: '/admin/faq', icon: HelpCircle, key: 'nav.faq' },
   { to: '/admin/administrators', icon: Users, key: 'nav.administrators' },
   { to: '/admin/settings', icon: Settings, key: 'nav.settings' },
+  { to: '/admin/updates', icon: Sparkles, key: 'nav.updates' },
 ];
 
 export default function AdminSidebar() {

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+﻿import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export type Language = 'uz' | 'ru' | 'en';
 
@@ -16,6 +16,7 @@ export const translations = {
     'nav.applications': 'Arizalar',
     'nav.administrators': 'Administratorlar',
     'nav.settings': 'Sozlamalar',
+    'nav.updates': 'Yangilanishlar',
     'nav.logout': 'Chiqish',
 
     // Settings
@@ -313,6 +314,7 @@ export const translations = {
     'nav.applications': 'Applications',
     'nav.administrators': 'Administrators',
     'nav.settings': 'Settings',
+    'nav.updates': 'Updates',
     'nav.logout': 'Logout',
 
     // Settings
