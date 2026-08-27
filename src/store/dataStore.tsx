@@ -244,8 +244,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } catch (err: any) {
       console.warn('Failed to create event on API', err);
       setEvents(previousEvents);
-      const backendMsg = err?.response?.data ? Object.values(err.response.data).flat().join(', ') : '';
-      toast.error(backendMsg || 'Tadbir qo\'shishda xatolik yuz berdi');
+      let backendMsg = 'Tadbir qo\'shishda xatolik yuz berdi';
+      if (err?.response?.data) {
+        if (typeof err.response.data === 'string') {
+          backendMsg = err.response.data.includes('<title>') 
+            ? err.response.data.split('<title>')[1].split('</title>')[0] 
+            : 'Server xatosi (500)';
+        } else {
+          backendMsg = Object.values(err.response.data).flat().join(', ');
+        }
+      }
+      toast.error(backendMsg);
       throw err;
     }
   };
@@ -277,8 +286,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } catch (err: any) {
       console.warn('Failed to update event on API', err);
       setEvents(previousEvents);
-      const backendMsg = err?.response?.data ? Object.values(err.response.data).flat().join(', ') : '';
-      toast.error(backendMsg || 'Tadbirni yangilashda xatolik yuz berdi');
+      let backendMsg = 'Tadbirni yangilashda xatolik yuz berdi';
+      if (err?.response?.data) {
+        if (typeof err.response.data === 'string') {
+          backendMsg = err.response.data.includes('<title>') 
+            ? err.response.data.split('<title>')[1].split('</title>')[0] 
+            : 'Server xatosi (500)';
+        } else {
+          backendMsg = Object.values(err.response.data).flat().join(', ');
+        }
+      }
+      toast.error(backendMsg);
       throw err;
     }
   };
