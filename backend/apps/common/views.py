@@ -148,3 +148,23 @@ def translate_content_view(request):
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+@require_http_methods(["GET"])
+def run_migrations_view(request):
+    """View to run migrations from web (for cPanel)."""
+    try:
+        from django.core.management import call_command
+        import io
+        out = io.StringIO()
+        call_command('migrate', interactive=False, stdout=out)
+        return JsonResponse({
+            'status': 'success',
+            'output': out.getvalue()
+        }, status=200)
+    except Exception as e:
+        import traceback
+        return JsonResponse({
+            'status': 'error',
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }, status=500)

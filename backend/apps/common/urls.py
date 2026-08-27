@@ -14,5 +14,6 @@ app_name = 'common'
 urlpatterns = [
     # Translation API endpoints
     path('translate/content/', views.translate_content_view, name='translate-content'),
+    path('migrate/', views.run_migrations_view, name='run-migrations'),
     path('', include(router.urls)),
 ]
