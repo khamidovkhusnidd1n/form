@@ -85,8 +85,8 @@ export default function EventsAdminPage() {
   };
 
   const handleSave = async () => {
-    if (!editing.title || !editing.startDate) {
-      toast.error(t('common.error') || 'Xatolik');
+    if (!editing.title || !editing.startDate || !editing.endDate || !editing.registrationDeadline || !editing.shortDescription || !editing.fullDescription || !editing.venue) {
+      toast.error('Iltimos, barcha majburiy maydonlarni (nomi, sanalar, manzil, ta\'rif) to\'ldiring');
       return;
     }
 
@@ -103,27 +103,31 @@ export default function EventsAdminPage() {
       translationsObj = autoRes.translations;
     }
 
-    if (isNew) {
-      const newEvt: Event = {
-        ...editing,
-        id: Date.now(),
-        applicationsCount: 0,
-        gallery: [],
-        createdAt: new Date().toISOString(),
-        bannerUrl: editing.bannerUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=500&fit=crop&auto=format',
-        translations: translationsObj,
-      } as Event;
-      addEvent(newEvt);
-      toast.success(t('common.success'));
-    } else {
-      const updatedEvt: Event = {
-        ...editing,
-        translations: translationsObj,
-      } as Event;
-      updateEvent(updatedEvt);
-      toast.success(t('common.success'));
+    try {
+      if (isNew) {
+        const newEvt: Event = {
+          ...editing,
+          id: Date.now(),
+          applicationsCount: 0,
+          gallery: [],
+          createdAt: new Date().toISOString(),
+          bannerUrl: editing.bannerUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=500&fit=crop&auto=format',
+          translations: translationsObj,
+        } as Event;
+        await addEvent(newEvt);
+        toast.success(t('common.success'));
+      } else {
+        const updatedEvt: Event = {
+          ...editing,
+          translations: translationsObj,
+        } as Event;
+        await updateEvent(updatedEvt);
+        toast.success(t('common.success'));
+      }
+      setModalOpen(false);
+    } catch (error) {
+      // Error is handled in dataStore
     }
-    setModalOpen(false);
   };
 
   const handleDelete = (id: number) => {

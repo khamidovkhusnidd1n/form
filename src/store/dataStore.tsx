@@ -118,9 +118,9 @@ interface DataContextType {
   events: Event[];
   faqs: FAQ[];
   applications: Application[];
-  addEvent: (event: Event) => void;
-  updateEvent: (event: Event) => void;
-  deleteEvent: (id: number) => void;
+  addEvent: (event: Event) => Promise<void>;
+  updateEvent: (event: Event) => Promise<void>;
+  deleteEvent: (id: number) => Promise<void>;
   addFaq: (faq: FAQ) => void;
   updateFaq: (faq: FAQ) => void;
   deleteFaq: (id: number) => void;
@@ -241,10 +241,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       fetchEvents();
-    } catch (err) {
+    } catch (err: any) {
       console.warn('Failed to create event on API', err);
       setEvents(previousEvents);
-      toast.error('Tadbir qo\'shishda xatolik yuz berdi');
+      const backendMsg = err?.response?.data ? Object.values(err.response.data).flat().join(', ') : '';
+      toast.error(backendMsg || 'Tadbir qo\'shishda xatolik yuz berdi');
+      throw err;
     }
   };
 
@@ -272,10 +274,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       fetchEvents();
-    } catch (err) {
+    } catch (err: any) {
       console.warn('Failed to update event on API', err);
       setEvents(previousEvents);
-      toast.error('Tadbirni yangilashda xatolik yuz berdi');
+      const backendMsg = err?.response?.data ? Object.values(err.response.data).flat().join(', ') : '';
+      toast.error(backendMsg || 'Tadbirni yangilashda xatolik yuz berdi');
+      throw err;
     }
   };
 
