@@ -96,8 +96,8 @@ export function transformApplication(item: any): Application {
     districtName: item.district_name ?? item.districtName ?? (typeof item.district === 'string' ? item.district : ''),
     eventId: typeof item.event === 'number' ? item.event : (item.eventId ?? 1),
     eventTitle: item.event_title ?? item.eventTitle ?? '',
-    presentationTitle: item.presentation_title ?? item.presentationTitle ?? '',
-    abstract: item.abstract || '',
+    presentationTitle: (item.presentation_title === 'undefined' ? '' : item.presentation_title) ?? (item.presentationTitle === 'undefined' ? '' : item.presentationTitle) ?? '',
+    abstract: (item.abstract === 'undefined' ? '' : item.abstract) || '',
     documentUrl: item.document_url ?? item.documentUrl,
     passportUrl: item.passport_url ?? item.passportUrl,
     passportSeriesNumber: passportSeriesVal,
@@ -375,8 +375,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     formData.append('country', app.country);
     formData.append('region', app.regionName || String(app.regionId));
     formData.append('district', app.districtName || String(app.districtId));
-    formData.append('presentation_title', app.presentationTitle);
-    formData.append('abstract', app.abstract);
+    formData.append('presentation_title', app.presentationTitle && app.presentationTitle !== 'undefined' ? app.presentationTitle : '');
+    formData.append('abstract', app.abstract && app.abstract !== 'undefined' ? app.abstract : '');
 
     if (app.documentFile) formData.append('document', app.documentFile);
     if (app.passportFile) formData.append('passport', app.passportFile);

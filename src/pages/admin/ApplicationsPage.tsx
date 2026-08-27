@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Eye, Download, ChevronLeft, ChevronRight, MessageSquare, CheckCircle, Globe, Sparkles, Trash2, AlertTriangle } from 'lucide-react';
+import { Search, Eye, Download, ChevronLeft, ChevronRight, MessageSquare, CheckCircle, Globe, Sparkles, Trash2, AlertTriangle, Edit2 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { StatusBadge } from '../../components/ui/Badge';
@@ -141,7 +141,7 @@ export default function ApplicationsPage() {
       [t('apply.region')]: app.regionName,
       [t('apply.district')]: app.districtName,
       [t('apply.event')]: app.eventTitle,
-      [t('apply.presentationTitle')]: app.presentationTitle,
+      [t('apply.presentationTitle')]: app.presentationTitle || "Yo'q",
       [t('appsAdmin.colStatus')]: getApplicationStatusLabel(app.status, language),
       [t('track.submittedDate')]: formatDate(app.submittedAt, language),
     }));
@@ -380,7 +380,7 @@ export default function ApplicationsPage() {
                 [t('apply.district'), selected.districtName],
                 [t('apply.event'), selected.eventTitle],
                 ['Qatnashish turi', selected.attendanceType === 'online' ? 'Online' : 'Offline'],
-                [t('apply.presentationTitle'), selected.presentationTitle],
+                [t('apply.presentationTitle'), selected.presentationTitle || "Yo'q"],
                 [t('track.submittedDate'), formatDate(selected.submittedAt, language)],
               ] as [string, string][]).map(([k, v]) => (
                 <div key={k} className="bg-slate-50 rounded-xl p-3">

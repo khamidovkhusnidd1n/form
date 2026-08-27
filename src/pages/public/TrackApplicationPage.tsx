@@ -167,7 +167,7 @@ export default function TrackApplicationPage() {
                   [t('apply.organization'), result.organization],
                   [t('apply.position'), result.position],
                   [t('apply.event'), result.eventTitle],
-                  [t('apply.presentationTitle'), result.presentationTitle],
+                  [t('apply.presentationTitle'), result.presentationTitle || "Yo'q"],
                   [t('track.submittedDate'), formatDate(result.submittedAt, language)],
                   [t('track.updatedDate'), formatDate(result.updatedAt, language)],
                 ] as [string, string][]).map(([k, v]) => (
