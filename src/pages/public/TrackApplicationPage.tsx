@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Search, CheckCircle, Clock, XCircle, FileText, Download, MessageSquare } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { StatusBadge } from '../../components/ui/Badge';
+import { QRCodeSVG } from 'qrcode.react';
 import { formatDate, getApplicationStatusLabel } from '../../lib/utils';
 import type { Application, ApplicationStatus } from '../../types';
 import { useTranslation } from '../../i18n';
@@ -123,6 +124,24 @@ export default function TrackApplicationPage() {
                     );
                   })}
                 </div>
+              </div>
+            )}
+
+
+            {result.status === 'approved' && (
+              <div className="bg-white rounded-2xl border border-slate-100 p-6 text-center shadow-sm">
+                <h3 className="font-bold text-slate-800 mb-2">Sizning QR-kod ruxsatnomangiz</h3>
+                <p className="text-sm text-slate-500 mb-6">Ushbu QR-kodni telefoningizga saqlab oling yoki skrinshot qiling. Tadbirga kelganingizda uni mas'ul xodimga ko'rsating.</p>
+                <div className="inline-block p-4 border-2 border-[#1a56db] rounded-2xl bg-white shadow-md">
+                  <QRCodeSVG 
+                    value={`https://form.uzbamalaka.uz/admin/check-in/${result.id}`} 
+                    size={200}
+                    level="H"
+                    includeMargin={false}
+                    fgColor="#1a56db"
+                  />
+                </div>
+                <p className="mt-4 text-xs font-mono text-slate-400">{result.applicationId}</p>
               </div>
             )}
 

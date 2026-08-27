@@ -15,6 +15,7 @@ import FAQAdminPage from '../pages/admin/FAQAdminPage';
 import AdministratorsPage from '../pages/admin/AdministratorsPage';
 import SettingsAdminPage from '../pages/admin/SettingsAdminPage';
 import UpdatesPage from '../pages/admin/UpdatesPage';
+import CheckInPage from '../pages/admin/CheckInPage';
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
       { path: 'administrators', element: <AdministratorsPage /> },
       { path: 'settings', element: <SettingsAdminPage /> },
       { path: 'updates', element: <UpdatesPage /> },
+      { path: 'check-in/:id', element: <CheckInPage /> },
       { path: '*', element: <Navigate to="/admin" replace /> },
     ],
   },

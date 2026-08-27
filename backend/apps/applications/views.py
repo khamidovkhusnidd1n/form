@@ -176,3 +176,19 @@ def export_applications_excel(request):
     response['Content-Disposition'] = 'attachment; filename="arizalar.xlsx"'
     wb.save(response)
     return response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework import permissions
+from .models import Application
+from apps.accounts.permissions import IsModeratorOrAbove
+
+@api_view(['POST'])
+@permission_classes([IsModeratorOrAbove])
+def check_in_application(request, pk):
+    try:
+        app = Application.objects.get(pk=pk)
+        app.attended = True
+        app.save()
+        return Response({'status': 'success', 'message': 'Application checked in successfully.'})
+    except Application.DoesNotExist:
+        return Response({'status': 'error', 'message': 'Application not found.'}, status=404)

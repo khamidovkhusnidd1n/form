@@ -82,7 +82,7 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
         fields = [
             'application_id', 'full_name', 'email', 'organization', 'position',
             'country', 'region', 'district', 'event_title', 'attendance_type', 'presentation_title', 'abstract',
-            'status', 'admin_comment', 'translations', 'submitted_at', 'updated_at',
+            'status', 'admin_comment', 'attended', 'translations', 'submitted_at', 'updated_at',
             'invitation_pdf', 'certificate_pdf',
         ]
         read_only_fields = fields

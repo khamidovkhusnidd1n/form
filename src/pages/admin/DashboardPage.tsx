@@ -26,6 +26,7 @@ export default function DashboardPage() {
     totalApplications: applications.length,
   }));
   const [monthlyStats, setMonthlyStats] = useState(MONTHLY_DATA_KEYS);
+  const [regionStats, setRegionStats] = useState<{region: string, count: number}[]>([]);
   const [loading, setLoading] = useState(false);  useEffect(() => {
     let isMounted = true;
     apiClient.get('/dashboard/')
@@ -44,6 +45,9 @@ export default function DashboardPage() {
         });
         if (data.monthly_applications && data.monthly_applications.length > 0) {
           setMonthlyStats(data.monthly_applications);
+        }
+        if (data.by_region) {
+          setRegionStats(data.by_region.map((r: any) => ({ region: r.region || 'Boshqa', count: r.count })));
         }
       })
       .catch(() => {
@@ -109,7 +113,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6 mb-6">
         <Card className="lg:col-span-2 p-6">
           <h3 className="font-bold text-slate-800 mb-6">{t('dash.monthlyChartTitle')}</h3>
           <ResponsiveContainer width="100%" height={240}>
@@ -149,6 +153,19 @@ export default function DashboardPage() {
           </div>
         </Card>
       </div>
+
+      <Card className="p-6">
+        <h3 className="font-bold text-slate-800 mb-6">Viloyatlar va Davlatlar bo'yicha ishtirokchilar</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={regionStats} layout="vertical" margin={{ top: 0, right: 0, left: 40, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={true} vertical={false} />
+            <XAxis type="number" hide />
+            <YAxis dataKey="region" type="category" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} width={120} />
+            <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
+            <Bar dataKey="count" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
     </div>
   );
 }
