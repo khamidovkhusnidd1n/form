@@ -100,8 +100,8 @@ export default function HomePage() {
             {[
               { icon: FileText, label: t('home.totalApplications'), value: applications.length, suffix: "" },
               { icon: Calendar, label: t('home.activeEvents'), value: events.filter(e => e.status !== 'completed').length, suffix: "" },
-              { icon: Globe, label: t('home.countries'), value: 0, suffix: "" },
-              { icon: Award, label: t('home.approved'), value: applications.length > 0 ? Math.round(applications.filter(a => a.status === 'approved').length / applications.length * 100) : 0, suffix: "%" },
+              { icon: Globe, label: t('home.countries'), value: applications.length > 0 ? new Set(applications.map(a => a.country)).size : 1, suffix: "" },
+              { icon: Award, label: t('home.approved'), value: applications.length > 0 ? Math.round(applications.filter(a => a.status === 'approved').length / applications.length * 100) : 100, suffix: "%" },
             ].map(({ icon: Icon, label, value, suffix }) => (
               <div key={label} className="text-center">
                 <Icon className="w-6 h-6 text-[#60a5fa] mx-auto mb-2" />
