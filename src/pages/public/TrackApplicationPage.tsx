@@ -29,7 +29,6 @@ export default function TrackApplicationPage() {
     if (!id.trim()) return;
     setLoading(true);
     setSearchParams({ id });
-    await new Promise(r => setTimeout(r, 600));
     const rawFound = applications.find(a => a.applicationId.toLowerCase() === id.trim().toLowerCase());
     setResult(rawFound ? getTranslatedContent(rawFound, language) : 'not_found');
     setLoading(false);

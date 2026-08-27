@@ -119,7 +119,6 @@ export default function ApplicationFormPage() {
       return;
     }
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 1200));
     const id = generateApplicationId();
 
     const selectedEvt = events.find(e => e.id.toString() === data.eventId);
@@ -241,7 +240,7 @@ export default function ApplicationFormPage() {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sm:p-8">
             <AnimatePresence mode="wait">
               {step === 1 && (
-                <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
+                <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }} className="space-y-5">
                   <h2 className="font-bold text-slate-800 text-lg mb-5">{t('apply.step1Title')}</h2>
                   <Input label={t('apply.fullName')} {...register('fullName')} error={errors.fullName?.message} placeholder={t('apply.fullNamePlaceholder')} required />
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -266,7 +265,7 @@ export default function ApplicationFormPage() {
               )}
 
               {step === 2 && (
-                <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
+                <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }} className="space-y-5">
                   <h2 className="font-bold text-slate-800 text-lg mb-5">{t('apply.step2Title')}</h2>
                   <Input label={t('apply.organization')} {...register('organization')} error={errors.organization?.message} placeholder={t('apply.organizationPlaceholder')} required />
                   <Input label={t('apply.position')} {...register('position')} error={errors.position?.message} placeholder={t('apply.positionPlaceholder')} required />
@@ -316,7 +315,7 @@ export default function ApplicationFormPage() {
               )}
 
               {step === 3 && (
-                <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
+                <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }} className="space-y-5">
                   <h2 className="font-bold text-slate-800 text-lg mb-5">{t('apply.step3Title')}</h2>
                   <Select
                     label={t('apply.event')}
@@ -398,7 +397,7 @@ export default function ApplicationFormPage() {
               )}
 
               {step === 4 && (
-                <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }} className="space-y-6">
                   <h2 className="font-bold text-slate-800 text-lg mb-5">{t('apply.documents')}</h2>
                   {[
                     { key: 'document' as const, label: t('apply.docThesis'), hint: t('apply.docThesisHint'), required: true, accept: ".pdf,.docx,.doc" },
