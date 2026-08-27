@@ -38,7 +38,7 @@ class EventDetailView(generics.RetrieveAPIView):
 
 class AdminEventListCreateView(generics.ListCreateAPIView):
     queryset = Event.objects.all().order_by('-created_at')
-    permission_classes = [IsAdminOrAbove]
+    permission_classes = [IsModeratorOrAbove]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_serializer_class(self):
@@ -49,7 +49,7 @@ class AdminEventListCreateView(generics.ListCreateAPIView):
 
 class AdminEventDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
-    permission_classes = [IsAdminOrAbove]
+    permission_classes = [IsModeratorOrAbove]
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
@@ -58,7 +58,7 @@ class AdminEventDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(['POST'])
-@permission_classes([IsAdminOrAbove])
+@permission_classes([IsModeratorOrAbove])
 def add_gallery_image(request, pk):
     event = Event.objects.get(pk=pk)
     serializer = EventGallerySerializer(data=request.data, context={'request': request})

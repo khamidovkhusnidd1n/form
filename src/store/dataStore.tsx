@@ -218,6 +218,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [applications]);
 
   const addEvent = async (e: Event) => {
+    const previousEvents = [...events];
     setEvents((prev) => [e, ...prev]);
     try {
       const formData = new FormData();
@@ -242,10 +243,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
       fetchEvents();
     } catch (err) {
       console.warn('Failed to create event on API', err);
+      setEvents(previousEvents);
+      toast.error('Tadbir qo\'shishda xatolik yuz berdi');
     }
   };
 
   const updateEvent = async (e: Event) => {
+    const previousEvents = [...events];
     setEvents((prev) => prev.map((item) => (item.id === e.id ? e : item)));
     try {
       const formData = new FormData();
@@ -267,8 +271,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
       await apiClient.patch(`/events/admin/${e.id}/`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+      fetchEvents();
     } catch (err) {
       console.warn('Failed to update event on API', err);
+      setEvents(previousEvents);
+      toast.error('Tadbirni yangilashda xatolik yuz berdi');
     }
   };
 
