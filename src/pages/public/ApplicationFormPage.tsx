@@ -14,6 +14,8 @@ import { getLocalizedRegions, generateApplicationId } from '../../lib/utils';
 import { useTranslation } from '../../i18n';
 import { useData } from '../../store/dataStore';
 import { getTranslatedContent } from '../../lib/translationService';
+import { PhoneInput } from 'react-international-phone';
+import 'react-international-phone/style.css';
 import type { Application } from '../../types';
 import { Country, State, City } from 'country-state-city';
 
@@ -278,7 +280,17 @@ export default function ApplicationFormPage() {
                     />
                   </div>
                   <div className="grid sm:grid-cols-2 gap-4">
-                    <Input label={t('apply.phone')} type="tel" {...register('phone')} error={errors.phone?.message} placeholder={t('apply.phonePlaceholder')} required />
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-slate-700">{t('apply.phone')}</label>
+                        <PhoneInput
+                          defaultCountry="uz"
+                          value={watch('phone')}
+                          onChange={(phone) => setValue('phone', phone, { shouldValidate: true })}
+                          inputClassName="!w-full !rounded-xl !border-slate-200 !h-11 !text-slate-800"
+                          countrySelectorStyleProps={{ buttonClassName: '!h-11 !rounded-l-xl !border-slate-200 !bg-slate-50' }}
+                        />
+                        {errors.phone && <p className="text-xs text-red-500">{errors.phone.message}</p>}
+                      </div>
                     <Input label={t('apply.email')} type="email" {...register('email')} error={errors.email?.message} placeholder={t('apply.emailPlaceholder')} required />
                   </div>
                 </motion.div>

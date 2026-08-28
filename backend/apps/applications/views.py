@@ -14,6 +14,7 @@ from .serializers import (
     ApplicationAdminSerializer, StatusUpdateSerializer
 )
 from apps.accounts.permissions import IsAdminOrAbove, IsModeratorOrAbove
+from apps.notifications.services import NotificationService
 from .services import ApplicationService
 
 
@@ -38,6 +39,10 @@ class SubmitApplicationView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         application = serializer.save()
+        try:
+            NotificationService.send_status_email(application, 'submitted')
+        except Exception:
+            pass
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
