@@ -7,8 +7,15 @@ class NotificationService:
     def send_email(subject: str, body: str, recipient: str) -> bool:
         if not settings.EMAIL_HOST_USER:
             return False
-        send_mail(subject=subject, message=body, from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[recipient], fail_silently=True)
-        return True
+        # umail.uz strict sender policy fix: ALWAYS send from EMAIL_HOST_USER
+        from_email = settings.EMAIL_HOST_USER
+        try:
+            send_mail(subject=subject, message=body, from_email=from_email, recipient_list=[recipient], fail_silently=False)
+            return True
+        except Exception as e:
+            import logging
+            logging.error(f"Mail failed: {e}")
+            return False
 
     @staticmethod
     def send_status_email(application, status: str) -> bool:
