@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, GraduationCap, ChevronDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useTranslation } from '../../i18n';
+import logoImage from '../../assets/logo_v2.png';
 import { LANGUAGE_LABELS, type Language } from '../../i18n';
 
 const NAV_LINKS = [
@@ -26,7 +27,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between min-h-[72px] sm:min-h-[80px]">
           <Link to="/" className="flex items-center gap-3 flex-1 min-w-0 mr-4 py-2">
-            <img src="/logo_v2.png" alt="Logo" className="w-14 h-14 sm:w-16 sm:h-16 object-contain shrink-0" />
+            <img src={logoImage} alt="Logo" className="w-14 h-14 sm:w-16 sm:h-16 object-contain shrink-0" />
             <div className="hidden sm:block min-w-0">
               <div className="text-[11px] sm:text-[13px] font-bold text-[#203a7a] leading-[1.4] max-w-[260px] sm:max-w-[300px]">{t('brand.subtitle')}</div>
             </div>

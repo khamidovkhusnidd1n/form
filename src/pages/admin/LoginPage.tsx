@@ -11,6 +11,7 @@ import { apiClient } from '../../api/client';
 import type { AdminUser } from '../../types';
 import ToastProvider from '../../components/ui/Toast';
 import { useTranslation } from '../../i18n';
+import logoImage from '../../assets/logo_v2.png';
 
 const schema = z.object({
   username: z.string().min(1, "Foydalanuvchi nomini kiriting"),
@@ -64,7 +65,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-6 shadow-xl shadow-[#1a56db]/20 relative z-10 p-2">
-              <img src="/logo_v2.png" alt="Logo" className="w-full h-full object-contain" />
+              <img src={logoImage} alt="Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-1">{t('login.title')}</h1>
             <p className="text-white/60 text-sm">CENTR FORM — {t('brand.subtitle')}</p>
