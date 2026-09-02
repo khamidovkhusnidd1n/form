@@ -180,12 +180,12 @@ CORS_ALLOWED_ORIGINS = list(set(
 CORS_ALLOW_CREDENTIALS = True
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_HOST = config('EMAIL_HOST', default='mail.umail.uz')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='CENTR FORM <noreply@akademiya.uz>')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='uzbamalakamarkaz@umail.uz')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='F_meB67mGwVU8T')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='uzbamalakamarkaz@umail.uz')
 
 REDIS_URL = config('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_BROKER_URL = REDIS_URL
