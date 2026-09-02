@@ -188,3 +188,48 @@ def run_makemigrations_view(request):
             'error': str(e),
             'traceback': traceback.format_exc()
         }, status=500)
+
+from django.core.mail import send_mail
+from django.conf import settings
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+import traceback
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def test_email_view(request):
+    try:
+        subject = "TEST - UZBA MARKAZ"
+        body = "Bu xat tizimni tekshirish uchun jo'natildi."
+        from_email = settings.EMAIL_HOST_USER or settings.DEFAULT_FROM_EMAIL
+        
+        send_mail(
+            subject=subject,
+            message=body,
+            from_email=from_email,
+            recipient_list=[from_email],
+            fail_silently=False
+        )
+        return Response({
+            "status": "SUCCESS",
+            "message": "Xat muvaffaqiyatli jo'natildi!",
+            "settings": {
+                "EMAIL_HOST": settings.EMAIL_HOST,
+                "EMAIL_PORT": settings.EMAIL_PORT,
+                "EMAIL_USE_TLS": settings.EMAIL_USE_TLS,
+                "EMAIL_HOST_USER": settings.EMAIL_HOST_USER,
+            }
+        })
+    except Exception as e:
+        return Response({
+            "status": "ERROR",
+            "error_type": type(e).__name__,
+            "error_message": str(e),
+            "traceback": traceback.format_exc(),
+            "settings": {
+                "EMAIL_HOST": settings.EMAIL_HOST,
+                "EMAIL_PORT": settings.EMAIL_PORT,
+                "EMAIL_USE_TLS": settings.EMAIL_USE_TLS,
+                "EMAIL_HOST_USER": settings.EMAIL_HOST_USER,
+            }
+        })
