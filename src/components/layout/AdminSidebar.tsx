@@ -3,7 +3,7 @@ import { LayoutDashboard, FileText, Calendar, HelpCircle, Users, LogOut, Graduat
 import { cn, getRoleLabel } from '../../lib/utils';
 import { useAuth } from '../../store/authStore';
 import { useTranslation } from '../../i18n';
-import logoImage from '../../assets/logo.png';
+import { logoBase64 as logoImage } from '../../assets/logo';
 
 const NAV_ITEMS = [
   { to: '/admin', icon: LayoutDashboard, key: 'nav.dashboard' },

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, GraduationCap, ChevronDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useTranslation } from '../../i18n';
-import logoImage from '../../assets/logo.png';
+import { logoBase64 as logoImage } from '../../assets/logo';
 import { LANGUAGE_LABELS, type Language } from '../../i18n';
 
 const NAV_LINKS = [

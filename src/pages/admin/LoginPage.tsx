@@ -11,7 +11,7 @@ import { apiClient } from '../../api/client';
 import type { AdminUser } from '../../types';
 import ToastProvider from '../../components/ui/Toast';
 import { useTranslation } from '../../i18n';
-import logoImage from '../../assets/logo.png';
+import { logoBase64 as logoImage } from '../../assets/logo';
 
 const schema = z.object({
   username: z.string().min(1, "Foydalanuvchi nomini kiriting"),
