@@ -68,7 +68,7 @@ export default function LoginPage() {
               <img src={logoImage} alt="Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-1">{t('login.title')}</h1>
-            <p className="text-white/60 text-sm">CENTR FORM — {t('brand.subtitle')}</p>
+            <p className="text-white/60 text-sm">CENTRE FORM — {t('brand.subtitle')}</p>
           </div>
 
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">

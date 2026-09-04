@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, FileText, Calendar, HelpCircle, Users, LogOut, GraduationCap, ChevronRight, Settings, Sparkles } from 'lucide-react';
 import { cn, getRoleLabel } from '../../lib/utils';
 import { useAuth } from '../../store/authStore';
+import { useData } from '../../store/dataStore';
 import { useTranslation } from '../../i18n';
 import { logoBase64 as logoImage } from '../../assets/logo';
 
@@ -20,6 +21,7 @@ export default function AdminSidebar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { t, language } = useTranslation();
+  const { applications } = useData();
 
   const handleLogout = () => {
     logout();
@@ -30,11 +32,11 @@ export default function AdminSidebar() {
     <aside className="w-64 shrink-0 bg-slate-900 min-h-screen flex flex-col">
       <div className="p-5 border-b border-slate-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a56db] to-[#0ea5e9] flex items-center justify-center">
-            <GraduationCap className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 flex items-center justify-center shrink-0">
+            <img src={logoImage} alt="Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <div className="font-bold text-white text-sm">CENTR FORM</div>
+            <div className="font-bold text-white text-sm">CENTRE FORM</div>
             <div className="text-[10px] text-slate-400">{t('footer.admin')}</div>
           </div>
         </div>
@@ -42,7 +44,16 @@ export default function AdminSidebar() {
 
       <nav className="flex-1 p-4 space-y-1">
         {NAV_ITEMS.map(({ to, icon: Icon, key }) => {
+          // Moderators should not see Administrators and Settings
+          if (user?.role === 'moderator' && (to === '/admin/administrators' || to === '/admin/settings')) {
+            return null;
+          }
+
           const active = location.pathname === to || (to !== '/admin' && location.pathname.startsWith(to));
+          
+          // Calculate new applications count for the badge
+          const newAppsCount = (key === 'nav.applications') ? applications.filter(a => a.status === 'submitted').length : 0;
+
           return (
             <Link
               key={to}
@@ -56,7 +67,15 @@ export default function AdminSidebar() {
             >
               <Icon className="w-4 h-4 shrink-0" />
               <span className="flex-1">{t(key)}</span>
-              {active && <ChevronRight className="w-4 h-4 opacity-60" />}
+              {newAppsCount > 0 && (
+                <span className="relative flex h-5 w-5 items-center justify-center">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 text-[10px] font-bold text-white items-center justify-center">
+                    {newAppsCount > 99 ? '99+' : newAppsCount}
+                  </span>
+                </span>
+              )}
+              {active && newAppsCount === 0 && <ChevronRight className="w-4 h-4 opacity-60" />}
             </Link>
           );
         })}

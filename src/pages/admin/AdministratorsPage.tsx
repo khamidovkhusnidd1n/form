@@ -6,6 +6,7 @@ import Modal from '../../components/ui/Modal';
 import type { AdminUser, UserRole } from '../../types';
 import toast from 'react-hot-toast';
 import { useTranslation } from '../../i18n';
+import { useAuth } from '../../store/authStore';
 import { apiClient } from '../../api/client';
 import { Loader2 } from 'lucide-react';
 
@@ -45,6 +46,7 @@ const getRoleLabel = (role: UserRole, lang: string): string => {
 };
 
 export default function AdministratorsPage() {
+  const { user: authUser } = useAuth();
   const { t, language } = useTranslation();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -198,7 +200,7 @@ export default function AdministratorsPage() {
                 </span>
                 <div className="flex gap-1">
                   <button onClick={() => openEdit(user)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500"><Edit2 className="w-4 h-4" /></button>
-                  {user.role !== 'super_admin' && (
+                  {user.id !== authUser?.id && (
                     <button
                       onClick={() => handleDelete(user.id)}
                       className="p-1.5 rounded-lg hover:bg-red-50 text-red-500"

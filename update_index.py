@@ -1,12 +1,62 @@
 ﻿import re
 
-with open('index.html', 'r', encoding='utf-8') as f:
-    content = f.read()
-
-# Add favicon
-if '<link rel="icon"' not in content:
-    content = content.replace('<title>CENTR FORM</title>', '<link rel="icon" type="image/png" href="/logo_v2.png" />\n    <title>CENTR FORM</title>')
+html = """<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <title>CENTR FORM</title>
+    <style>
+      body {
+        margin: 0;
+        background-color: #f8fafc;
+      }
+      .global-loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(26, 86, 219, 0.1);
+        border-radius: 50%;
+        border-top-color: #1a56db;
+        animation: spin 1s ease-in-out infinite;
+        margin-bottom: 20px;
+      }
+      .loader-text {
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: .5; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="global-loader">
+        <div class="spinner"></div>
+        <div class="loader-text">CENTR FORM...</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>"""
 
 with open('index.html', 'w', encoding='utf-8') as f:
-    f.write(content)
+    f.write(html)
 print("Updated index.html")
