@@ -10,6 +10,15 @@ class PublicOrganizationSettingsSerializer(serializers.ModelSerializer):
         ]
 
 class AdminOrganizationSettingsSerializer(serializers.ModelSerializer):
+    smtp_password = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    sms_api_key = serializers.CharField(write_only=True, required=False, allow_blank=True)
+
     class Meta:
         model = OrganizationSettings
         fields = '__all__'
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['has_smtp_password'] = bool(instance.smtp_password)
+        ret['has_sms_api_key'] = bool(instance.sms_api_key)
+        return ret

@@ -1,9 +1,14 @@
-﻿import smtplib
+import os
+import smtplib
 
-host = "mail.umail.uz"
-port = 587
-user = "uzbamalakamarkaz@umail.uz"
-password = "F_meB67mGwVU8T"
+host = os.environ.get("EMAIL_HOST", "mail.umail.uz")
+port = int(os.environ.get("EMAIL_PORT", 587))
+user = os.environ.get("EMAIL_HOST_USER", "uzbamalakamarkaz@umail.uz")
+password = os.environ.get("EMAIL_HOST_PASSWORD", "")
+
+if not password:
+    print("EMAIL_HOST_PASSWORD muhit o'zgaruvchisi o'rnatilmagan.")
+    exit(1)
 
 try:
     print(f"Connecting to {host}:{port}...")
@@ -15,3 +20,4 @@ try:
     server.quit()
 except Exception as e:
     print("Error:", e)
+

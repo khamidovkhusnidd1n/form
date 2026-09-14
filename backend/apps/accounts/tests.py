@@ -13,13 +13,16 @@ class IsModeratorOrAboveTests(unittest.TestCase):
         self.assertFalse(self.permission.has_permission(self.request, None))
 
     def test_superuser_or_staff_allowed(self):
+        # Superusers are unconditionally granted permission
         self.request.user.is_authenticated = True
         self.request.user.is_superuser = True
         self.assertTrue(self.permission.has_permission(self.request, None))
 
+        # Staff flag alone without a qualifying role is denied under strict RBAC
         self.request.user.is_superuser = False
         self.request.user.is_staff = True
-        self.assertTrue(self.permission.has_permission(self.request, None))
+        self.request.user.role = None
+        self.assertFalse(self.permission.has_permission(self.request, None))
 
     def test_valid_roles_allowed(self):
         self.request.user.is_authenticated = True

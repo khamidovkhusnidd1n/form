@@ -12,15 +12,14 @@ urlpatterns = [
     path('api/v1/qr/', include('apps.qr.urls')),
     path('api/v1/settings/', include('apps.settings_app.urls')),
     path('api/v1/common/', include('apps.common.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 from .views import react_app_view
-import os
-from django.views.static import serve
 
 urlpatterns += [
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-    re_path(r'^assets/(?P<path>.*)$', serve, {'document_root': os.path.join(settings.BASE_DIR, '..', 'assets')}),
-    re_path(r'^(?P<path>.*\.(png|jpg|jpeg|gif|ico|svg|webp|js|css|woff|woff2|ttf|eot))$', serve, {'document_root': os.path.join(settings.BASE_DIR, '..')}),
     re_path(r'^(?!api/|media/|static/).*$', react_app_view),
 ]

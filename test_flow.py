@@ -1,4 +1,4 @@
-﻿import os
+import os
 import django
 from django.conf import settings
 
@@ -7,8 +7,8 @@ settings.configure(
     EMAIL_HOST='mail.umail.uz',
     EMAIL_PORT=587,
     EMAIL_USE_TLS=True,
-    EMAIL_HOST_USER='uzbamalakamarkaz@umail.uz',
-    EMAIL_HOST_PASSWORD='F_meB67mGwVU8T',
+    EMAIL_HOST_USER=os.environ.get('EMAIL_HOST_USER', 'uzbamalakamarkaz@umail.uz'),
+    EMAIL_HOST_PASSWORD=os.environ.get('EMAIL_HOST_PASSWORD', ''),
     DEFAULT_FROM_EMAIL='uzbamalakamarkaz@umail.uz',
     INSTALLED_APPS=[
         'django.contrib.admin',

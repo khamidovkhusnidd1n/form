@@ -1,4 +1,4 @@
-﻿import re
+import re
 
 with open('backend/centr_form/settings.py', 'r', encoding='utf-8') as f:
     content = f.read()
@@ -33,7 +33,7 @@ EMAIL_HOST = config('EMAIL_HOST', default='mail.umail.uz')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='uzbamalakamarkaz@umail.uz')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='F_meB67mGwVU8T')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='uzbamalakamarkaz@umail.uz')'''
 
 new_email = '''EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

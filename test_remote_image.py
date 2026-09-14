@@ -1,3 +1,4 @@
+import os
 ﻿import requests
 import json
 import io
@@ -6,7 +7,7 @@ base_url = 'https://form.uzbamalaka.uz/api/v1'
 
 resp = requests.post(f"{base_url}/auth/login/", data={
     "username": "admin",
-    "password": "Markaz2026!"
+    "password": os.environ.get('API_PASSWORD', '')
 })
 token = resp.json().get('access')
 

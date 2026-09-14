@@ -1,5 +1,7 @@
 from rest_framework import generics, status, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters import rest_framework as filters
@@ -36,6 +38,8 @@ class SubmitApplicationView(generics.CreateAPIView):
     serializer_class = ApplicationSubmitSerializer
     permission_classes = [permissions.AllowAny]
     parser_classes = [MultiPartParser, FormParser]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'application_submit'
 
     def perform_create(self, serializer):
         application = serializer.save()
@@ -55,15 +59,80 @@ class SubmitApplicationView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
-@api_view(['GET'])
-@permission_classes([permissions.AllowAny])
-def track_application(request, application_id):
-    try:
-        application = Application.objects.get(application_id=application_id.upper())
-        serializer = ApplicationStatusSerializer(application)
-        return Response(serializer.data)
-    except Application.DoesNotExist:
-        return Response({'detail': "Ariza topilmadi"}, status=status.HTTP_404_NOT_FOUND)
+class TrackApplicationView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'application_track'
+
+    def get(self, request, application_id=None, *args, **kwargs):
+        app_id = application_id or kwargs.get('application_id') or (args[0] if args else None)
+        return self._handle_tracking(request, app_id)
+
+    def post(self, request, application_id=None, *args, **kwargs):
+        app_id = application_id or kwargs.get('application_id') or (args[0] if args else None)
+        return self._handle_tracking(request, app_id)
+
+    def _handle_tracking(self, request, application_id):
+        phone = request.query_params.get('phone')
+        if not phone and hasattr(request, 'data') and isinstance(request.data, dict):
+            phone = request.data.get('phone')
+
+        if not phone or not str(phone).strip():
+            return Response(
+                {'detail': "Ariza holatini ko'rish uchun telefon raqami kiritilishi shart."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        clean_req_phone = ''.join(c for c in str(phone) if c.isdigit())
+        if len(clean_req_phone) < 7:
+            return Response(
+                {'detail': "Telefon raqami noto'g'ri formatda."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            application = Application.objects.select_related('event').get(
+                application_id=str(application_id).strip().upper()
+            )
+        except (Application.DoesNotExist, AttributeError, ValueError):
+            return Response(
+                {'detail': "Ariza topilmadi yoki telefon raqami mos kelmadi."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        clean_app_phone = ''.join(c for c in str(application.phone or '') if c.isdigit()) if application.phone else ''
+        if len(clean_app_phone) < 7:
+            return Response(
+                {'detail': "Ariza topilmadi yoki telefon raqami mos kelmadi."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not (clean_req_phone == clean_app_phone or clean_app_phone.endswith(clean_req_phone) or clean_req_phone.endswith(clean_app_phone)):
+            return Response(
+                {'detail': "Ariza topilmadi yoki telefon raqami mos kelmadi."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Return only restricted, safe fields to protect applicant PII and avoid leaking admin comments/passports
+        invitation_url = request.build_absolute_uri(application.invitation_pdf.url) if application.invitation_pdf else None
+        certificate_url = request.build_absolute_uri(application.certificate_pdf.url) if application.certificate_pdf else None
+
+        return Response({
+            'application_id': application.application_id,
+            'full_name': application.full_name,
+            'event_title': application.event.title if application.event else None,
+            'attendance_type': application.attendance_type,
+            'status': application.status,
+            'submitted_at': application.submitted_at,
+            'updated_at': application.updated_at,
+            'invitation_pdf': invitation_url,
+            'certificate_pdf': certificate_url,
+        })
+
+
+# Backward-compatible functional callable alias
+track_application = TrackApplicationView.as_view()
+track_application.throttle_scope = 'application_track'
 
 
 class AdminApplicationListView(generics.ListAPIView):

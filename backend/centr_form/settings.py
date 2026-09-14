@@ -12,22 +12,28 @@ if env_path.exists():
 else:
     config = default_config
 
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 SECRET_KEY = config('SECRET_KEY', default=None)
 if not SECRET_KEY:
     secret_path = BASE_DIR / '.secret_key'
     if secret_path.exists():
         with open(secret_path, 'r') as f:
             SECRET_KEY = f.read().strip()
-    else:
-        SECRET_KEY = 'django-insecure-dev-' + get_random_secret_key()
+    if not SECRET_KEY or SECRET_KEY.startswith('django-insecure-'):
+        SECRET_KEY = get_random_secret_key()
         try:
             with open(secret_path, 'w') as f:
                 f.write(SECRET_KEY)
         except Exception:
             pass
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
+raw_allowed_hosts = config('ALLOWED_HOSTS', default='form.uzbamalaka.uz,localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in raw_allowed_hosts.split(',') if host.strip()]
+if not DEBUG:
+    ALLOWED_HOSTS = [h for h in ALLOWED_HOSTS if h != '*']
+    if not ALLOWED_HOSTS:
+        ALLOWED_HOSTS = ['form.uzbamalaka.uz', 'localhost', '127.0.0.1']
+
 
 DJANGO_APPS = [
     'django.contrib.auth',
@@ -61,8 +67,8 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -161,8 +167,16 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle',
     ],
-    'DEFAULT_THROTTLE_RATES': {'anon': '10000/hour', 'user': '1000/hour'},
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '120/minute',
+        'user': '600/minute',
+        'auth_login': '5/minute',
+        'auth_password': '5/minute',
+        'application_submit': '10/minute',
+        'application_track': '30/minute',
+    },
 }
 
 SIMPLE_JWT = {
@@ -176,15 +190,21 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
 }
 
+CORS_ALLOW_ALL_ORIGINS = False
 raw_cors_origins = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:5173,http://localhost:3000,http://localhost:8443,http://127.0.0.1:8443,http://127.0.0.1:5173'
+    default='https://form.uzbamalaka.uz' if not DEBUG else 'http://localhost:5173,http://localhost:3000,http://localhost:8443,http://127.0.0.1:8443,http://127.0.0.1:5173'
 )
-CORS_ALLOWED_ORIGINS = list(set(
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(
     [origin.strip() for origin in raw_cors_origins.split(',') if origin.strip()] +
-    [config('FRONTEND_URL', default='http://localhost:8443').strip()]
+    ([config('FRONTEND_URL', default='http://localhost:8443').strip()] if DEBUG else ['https://form.uzbamalaka.uz'])
 ))
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = False
+
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys([
+    origin if origin.startswith(('http://', 'https://')) else f"https://{origin}"
+    for origin in CORS_ALLOWED_ORIGINS
+] + ['https://form.uzbamalaka.uz']))
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST', default='mail.umail.uz')
@@ -203,13 +223,27 @@ CELERY_TIMEZONE = 'Asia/Tashkent'
 
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8443')
 
-# Security settings for production
+# Cookie security settings
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Security headers
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+
 if not DEBUG:
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+else:
+    SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
+    CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+    SECURE_HSTS_SECONDS = 0
+

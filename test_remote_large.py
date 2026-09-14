@@ -1,8 +1,13 @@
-﻿import requests
+import os
+import requests
 
-base_url = 'https://form.uzbamalaka.uz/api/v1'
+base_url = os.environ.get('API_BASE_URL', 'https://form.uzbamalaka.uz/api/v1')
+password = os.environ.get('API_PASSWORD', '')
+if not password:
+    print("API_PASSWORD muhit o'zgaruvchisi o'rnatilmagan.")
+    exit(1)
 
-resp = requests.post(f"{base_url}/auth/login/", data={"username": "admin", "password": "Markaz2026!"})
+resp = requests.post(f"{base_url}/auth/login/", data={"username": "admin", "password": password})
 token = resp.json().get('access')
 headers = {"Authorization": f"Bearer {token}"}
 

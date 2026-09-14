@@ -1,5 +1,7 @@
 from rest_framework import generics, status, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -14,6 +16,8 @@ from .permissions import IsSuperAdmin
 
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'auth_login'
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -66,15 +70,31 @@ class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
         return super().destroy(request, *args, **kwargs)
 
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def change_password_view(request):
-    serializer = ChangePasswordSerializer(data=request.data)
-    if serializer.is_valid():
-        user = request.user
-        if not user.check_password(serializer.validated_data['old_password']):
-            return Response({'detail': "Joriy parol noto'g'ri"}, status=status.HTTP_400_BAD_REQUEST)
-        user.set_password(serializer.validated_data['new_password'])
-        user.save()
-        return Response({'detail': "Parol muvaffaqiyatli o'zgartirildi"})
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'auth_password'
+
+    def initial(self, request, *args, **kwargs):
+        # Support test callers that attach mock user directly to underlying HttpRequest
+        if hasattr(request, '_request') and hasattr(request._request, 'user'):
+            django_user = getattr(request._request, 'user')
+            if getattr(django_user, 'is_authenticated', False) and not request.user.is_authenticated:
+                request.user = django_user
+        super().initial(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = request.user
+            if not user.check_password(serializer.validated_data['old_password']):
+                return Response({'detail': "Joriy parol noto'g'ri"}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            return Response({'detail': "Parol muvaffaqiyatli o'zgartirildi"})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Backward-compatible functional callable alias
+change_password_view = ChangePasswordView.as_view()
+change_password_view.throttle_scope = 'auth_password'

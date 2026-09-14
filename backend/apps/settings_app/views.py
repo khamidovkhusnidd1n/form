@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions
+from apps.accounts.permissions import IsSuperAdmin
 from .models import OrganizationSettings
 from .serializers import PublicOrganizationSettingsSerializer, AdminOrganizationSettingsSerializer
 
@@ -12,7 +13,7 @@ class PublicOrganizationSettingsView(generics.RetrieveAPIView):
 
 class AdminOrganizationSettingsView(generics.RetrieveUpdateAPIView):
     serializer_class = AdminOrganizationSettingsSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsSuperAdmin]
 
     def get_object(self):
         obj, created = OrganizationSettings.objects.get_or_create(id=1)
