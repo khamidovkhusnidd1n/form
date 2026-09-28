@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import PublicLayout from '../components/layout/PublicLayout';
 import AdminLayout from '../components/layout/AdminLayout';
+import ErrorElement from '../components/ui/ErrorElement';
 import HomePage from '../pages/public/HomePage';
 import EventsPage from '../pages/public/EventsPage';
 import EventDetailPage from '../pages/public/EventDetailPage';
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <PublicLayout />,
+    errorElement: <ErrorElement />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'events', element: <EventsPage /> },
@@ -34,6 +36,7 @@ export const router = createBrowserRouter([
   {
     path: '/admin',
     element: <AdminLayout />,
+    errorElement: <ErrorElement />,
     children: [
       { index: true, element: <DashboardPage /> },
       { path: 'dashboard', element: <Navigate to="/admin" replace /> },
