@@ -51,8 +51,15 @@ export default function UserCabinet() {
       <h1 className="text-3xl font-bold mb-6 text-slate-800">Mening Kabinetim</h1>
       
       {apps.length === 0 ? (
-        <div className="bg-white shadow rounded-lg p-8 text-center text-slate-500">
-          Hali arizalar yo'q.
+        <div className="bg-white shadow-sm rounded-2xl p-12 text-center border border-slate-100 flex flex-col items-center justify-center">
+          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+            <FileText className="w-8 h-8 text-slate-400" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-700 mb-2">Hali arizalar yo'q</h3>
+          <p className="text-slate-500 mb-6 max-w-sm">Siz hali hech qanday tadbir yoki imtihon uchun ariza yubormagansiz.</p>
+          <a href="/" className="bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm">
+            Tadbirlarni ko'rish
+          </a>
         </div>
       ) : (
         <div className="space-y-6">
