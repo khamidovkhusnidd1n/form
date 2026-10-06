@@ -73,7 +73,7 @@ export default function ApplicationFormPage() {
     { id: 4, title: t('apply.step4Title'), icon: Upload },
   ];
 
-  const { register, handleSubmit, formState: { errors }, trigger, watch, setValue } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors }, trigger, watch, setValue, getValues } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { eventId: searchParams.get('event') || '', country: "O'zbekiston" },
   });
