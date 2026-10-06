@@ -430,7 +430,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setApplications((prev) => prev.filter((item) => item.id !== id));
     try {
       // Use bulk-delete with POST instead of DELETE method to avoid cPanel blocking DELETE requests
-      await apiClient.post(`/applications/admin/bulk-delete/`, { ids: [id] });
+      await apiClient.post(`/applications/admin/bulk-remove/`, { ids: [id] });
     } catch (err) {
       console.error('Failed to delete application', err);
       throw err;
@@ -440,7 +440,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const deleteMultipleApplications = async (ids: number[]) => {
     setApplications((prev) => prev.filter((item) => !ids.includes(item.id)));
     try {
-      await apiClient.post(`/applications/admin/bulk-delete/`, { ids });
+      await apiClient.post(`/applications/admin/bulk-remove/`, { ids });
     } catch (err) {
       console.error('Failed to bulk delete applications', err);
       throw err;
