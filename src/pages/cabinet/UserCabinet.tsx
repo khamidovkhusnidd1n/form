@@ -18,11 +18,14 @@ export default function UserCabinet() {
     api.get('/applications/me/', {
       headers: { Authorization: 'Bearer ' + token  }
     }).then(res => setApps(res.data.results || res.data))
-      .catch(console.error);
+      .catch(err => {
+        console.error(err);
+        toast.error("Arizalarni yuklashda xatolik yuz berdi");
+      });
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && token) {
       fetchApps();
     }
   }, [isAuthenticated, token]);
