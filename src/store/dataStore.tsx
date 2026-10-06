@@ -355,7 +355,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const reorderFaqs = (newFaqs: FAQ[]) => setFaqs(newFaqs);
 
   const addApplication = async (app: Application) => {
-    setApplications((prev) => [app, ...prev]);
+    // Do NOT add optimistically: a rejected submission must never appear in the list.
 
     const formData = new FormData();
     formData.append('event', String(app.eventId));
