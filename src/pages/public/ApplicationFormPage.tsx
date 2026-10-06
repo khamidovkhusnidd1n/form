@@ -241,7 +241,7 @@ export default function ApplicationFormPage() {
             <p className="text-xs text-slate-400 mt-1">{t('apply.idNotice')}</p>
           </div>
           <div className="flex flex-col gap-3">
-            <a href={`/track?id=${successId}`}>
+            <a href={`/track?id=${successId}&phone=${encodeURIComponent(getValues('phone') || '')}`}>
               <Button className="w-full justify-center">{t('apply.trackBtn')}</Button>
             </a>
             <Button variant="ghost" onClick={() => { setSuccessId(null); setStep(1); }} className="w-full justify-center">

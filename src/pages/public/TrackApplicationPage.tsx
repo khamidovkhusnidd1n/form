@@ -20,7 +20,7 @@ export default function TrackApplicationPage() {
   const { applications } = useData();
 
   const [query, setQuery] = useState(searchParams.get('id') || '');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(searchParams.get('phone') || '');
   const [result, setResult] = useState<Application | null | 'not_found'>(null);
   const [loading, setLoading] = useState(false);
 
@@ -68,15 +68,21 @@ export default function TrackApplicationPage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h1 className="font-display text-4xl font-bold mb-3">{t('track.title')}</h1>
           <p className="text-white/70 mb-8">{t('track.subtitle')}</p>
-          <div className="flex gap-3 max-w-lg mx-auto">
+          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
-              placeholder={t('track.placeholder')}
-              className="flex-1 bg-white rounded-xl border-0 px-5 py-3.5 text-slate-800 font-mono text-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-white/30"
+              placeholder="Ariza ID (CF-2026-...)"
+              className="flex-1 bg-white rounded-xl border-0 px-5 py-3.5 text-slate-800 font-mono text-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <Button size="lg" loading={loading} onClick={() => handleSearch(query)} icon={<Search className="w-5 h-5" />} className="shrink-0">
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
+              placeholder="Telefon raqam"
+              className="flex-1 bg-white rounded-xl border-0 px-5 py-3.5 text-slate-800 font-mono text-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <Button size="lg" loading={loading} onClick={() => handleSearch(query)} disabled={!query.trim() || !phone.trim() || loading} icon={<Search className="w-5 h-5" />} className="shrink-0">
               {t('track.button')}
             </Button>
           </div>
