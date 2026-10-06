@@ -293,7 +293,11 @@ class MyApplicationListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Application.objects.filter(user=self.request.user).order_by('-submitted_at')
+        from django.db.models import Q
+        user = self.request.user
+        return Application.objects.filter(
+            Q(user=user) | Q(email__iexact=user.email)
+        ).order_by('-submitted_at')
 
 class UserReplyView(APIView):
     permission_classes = [permissions.IsAuthenticated]
