@@ -303,8 +303,9 @@ class UserReplyView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def patch(self, request, pk):
+        from django.db.models import Q
         try:
-            application = Application.objects.get(pk=pk, user=request.user)
+            application = Application.objects.get(Q(pk=pk) & (Q(user=request.user) | Q(email__iexact=request.user.email)))
             application.user_reply = request.data.get('user_reply', '')
             application.save()
             return Response({"detail": "Javob saqlandi."}, status=status.HTTP_200_OK)

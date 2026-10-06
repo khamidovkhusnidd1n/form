@@ -92,7 +92,7 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
         fields = [
-            'application_id', 'full_name', 'email', 'organization', 'position',
+            'id', 'application_id', 'full_name', 'email', 'organization', 'position',
             'country', 'region', 'district', 'event_title', 'attendance_type', 'presentation_title', 'abstract',
             'status', 'admin_comment', 'attended', 'translations', 'submitted_at', 'updated_at',
             'invitation_pdf', 'certificate_pdf',
