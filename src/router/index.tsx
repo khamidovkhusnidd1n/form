@@ -1,5 +1,9 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import PublicLayout from '../components/layout/PublicLayout';
+import ParticipantLoginPage from '../pages/public/auth/LoginPage';
+import ParticipantRegisterPage from '../pages/public/auth/RegisterPage';
+import CertificateCheckPage from '../pages/public/CertificateCheckPage';
+import UserCabinet from '../pages/cabinet/UserCabinet';
 import AdminLayout from '../components/layout/AdminLayout';
 import ErrorElement from '../components/ui/ErrorElement';
 import HomePage from '../pages/public/HomePage';
@@ -29,6 +33,10 @@ export const router = createBrowserRouter([
       { path: 'events/:id', element: <EventDetailPage /> },
       { path: 'apply', element: <ApplicationFormPage /> },
       { path: 'track', element: <TrackApplicationPage /> },
+      { path: 'login', element: <ParticipantLoginPage /> },
+      { path: 'register', element: <ParticipantRegisterPage /> },
+      { path: 'certificate-check', element: <CertificateCheckPage /> },
+      { path: 'cabinet', element: <UserCabinet /> },
       { path: 'faq', element: <FAQPage /> },
     ],
   },

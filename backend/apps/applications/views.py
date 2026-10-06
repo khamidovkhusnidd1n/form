@@ -42,7 +42,7 @@ class SubmitApplicationView(generics.CreateAPIView):
     throttle_scope = 'application_submit'
 
     def perform_create(self, serializer):
-        application = serializer.save()
+        application = serializer.save(user=self.request.user if self.request.user.is_authenticated else None)
         try:
             NotificationService.send_status_email(application, 'submitted')
         except Exception:
@@ -266,3 +266,22 @@ def check_in_application(request, pk):
         return Response({'status': 'success', 'message': 'Application checked in successfully.'})
     except Application.DoesNotExist:
         return Response({'status': 'error', 'message': 'Application not found.'}, status=404)
+
+class MyApplicationListView(generics.ListAPIView):
+    serializer_class = ApplicationStatusSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Application.objects.filter(user=self.request.user).order_by('-submitted_at')
+
+class UserReplyView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            application = Application.objects.get(pk=pk, user=request.user)
+            application.user_reply = request.data.get('user_reply', '')
+            application.save()
+            return Response({"detail": "Javob saqlandi."}, status=status.HTTP_200_OK)
+        except Application.DoesNotExist:
+            return Response({"detail": "Ariza topilmadi."}, status=status.HTTP_404_NOT_FOUND)

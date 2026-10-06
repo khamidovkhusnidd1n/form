@@ -208,7 +208,7 @@ export default function ApplicationsPage() {
           )}
           <Button variant="outline" className="hidden sm:flex bg-white" onClick={handleExportExcel}>
             <Download className="w-4 h-4 mr-2" />
-            {t('appsAdmin.export')}
+            Excel ga yuklab olish
           </Button>
         </div>
       </div>
@@ -315,7 +315,18 @@ export default function ApplicationsPage() {
                         title={t('appsAdmin.changeStatusTitle')}
                       >
                         <MessageSquare className="w-4 h-4" />
-                      </button>
+                        </button>
+                      {app.status === 'approved' && (app as any).certificate_pdf && (
+                        <a 
+                          href={(app as any).certificate_pdf} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-500 transition-colors" 
+                          title="Sertifikatni yuklash"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        </a>
+                      )}
                       <button 
                         onClick={() => setDeleteConfirmModal({ type: 'single', id: app.id })}
                         className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors" 
@@ -419,6 +430,13 @@ export default function ApplicationsPage() {
               <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
                 <p className="text-xs text-amber-600 font-medium mb-1">{t('appsAdmin.commentLabel')}</p>
                 <p className="text-sm text-amber-800">{selected.adminComment}</p>
+              </div>
+            )}
+            
+            {(selected as any).user_reply && (
+              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 mt-4">
+                <p className="text-xs text-blue-600 font-medium mb-1">Foydalanuvchi javobi</p>
+                <p className="text-sm text-blue-800">{(selected as any).user_reply}</p>
               </div>
             )}
           </div>

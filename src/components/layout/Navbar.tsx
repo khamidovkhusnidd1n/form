@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, GraduationCap, ChevronDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useTranslation } from '../../i18n';
+import { useAuth } from '../../store/authStore';
 import { logoBase64 as logoImage } from '../../assets/logo';
 import { LANGUAGE_LABELS, type Language } from '../../i18n';
 
@@ -17,6 +18,7 @@ const NAV_LINKS = [
 const LANGUAGES: Language[] = ['uz', 'ru', 'en'];
 
 export default function Navbar() {
+  const { isAuthenticated } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const location = useLocation();
@@ -51,6 +53,16 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-3 lg:ml-6">
+            <div className="hidden lg:flex items-center gap-2 border-r pr-4">
+              {isAuthenticated ? (
+                <>
+                  <Link to="/cabinet" className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">Kabinet</Link>
+                  <button onClick={() => { localStorage.removeItem('centr-form-auth'); window.location.href='/'; }} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">Chiqish</button>
+                </>
+              ) : (
+                <Link to="/login" className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Kirish</Link>
+              )}
+            </div>
             <div className="relative hidden sm:block">
               <button
                 type="button"

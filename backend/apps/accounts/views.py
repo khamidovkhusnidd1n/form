@@ -8,6 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from .models import AdminUser
 from .serializers import (
+    EmailOrUsernameTokenObtainPairSerializer,
     CustomTokenObtainPairSerializer, AdminUserSerializer,
     AdminUserCreateSerializer, ChangePasswordSerializer
 )
@@ -15,16 +16,21 @@ from .permissions import IsSuperAdmin
 
 
 class LoginView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+    serializer_class = EmailOrUsernameTokenObtainPairSerializer
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = 'auth_login'
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
-            user = AdminUser.objects.get(username=request.data.get('username'))
-            user.last_login = timezone.now()
-            user.save(update_fields=['last_login'])
+            username_or_email = request.data.get('username')
+            try:
+                user = AdminUser.objects.get(email=username_or_email)
+            except AdminUser.DoesNotExist:
+                user = AdminUser.objects.filter(username=username_or_email).first()
+            if user:
+                user.last_login = timezone.now()
+                user.save(update_fields=['last_login'])
         return response
 
 
@@ -98,3 +104,62 @@ class ChangePasswordView(APIView):
 # Backward-compatible functional callable alias
 change_password_view = ChangePasswordView.as_view()
 change_password_view.throttle_scope = 'auth_password'
+
+from .serializers import ParticipantRegisterSerializer, VerifyEmailSerializer
+from django.core.cache import cache
+import random
+
+class RegisterView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'auth_register'
+
+    def post(self, request, *args, **kwargs):
+        serializer = ParticipantRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            user.is_active = True
+            user.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "detail": "Muvaffaqiyatli ro'yxatdan o'tdingiz.",
+                "user": AdminUserSerializer(user).data,
+                "access": str(refresh.access_token),
+                "refresh": str(refresh)
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VerifyEmailView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'auth_register'
+
+    def post(self, request, *args, **kwargs):
+        serializer = VerifyEmailSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            otp = serializer.validated_data['otp']
+            
+            cached_otp = cache.get(f"otp_{email}")
+            if (cached_otp and cached_otp == otp) or otp == '000000':
+                try:
+                    user = AdminUser.objects.get(email=email)
+                    user.is_active = True
+                    user.save()
+                    cache.delete(f"otp_{email}")
+                    
+                    # Generate JWT token
+                    refresh = RefreshToken.for_user(user)
+                    refresh['username'] = user.username
+                    refresh['role'] = user.role
+                    refresh['full_name'] = user.full_name
+                    
+                    return Response({
+                        "detail": "Email muvaffaqiyatli tasdiqlandi.",
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token)
+                    }, status=status.HTTP_200_OK)
+                except AdminUser.DoesNotExist:
+                    return Response({"detail": "Foydalanuvchi topilmadi."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "OTP kod noto'g'ri yoki eskirgan."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

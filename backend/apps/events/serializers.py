@@ -21,6 +21,13 @@ class EventListSerializer(serializers.ModelSerializer):
     applications_count = serializers.IntegerField(read_only=True)
     is_registration_open = serializers.BooleanField(read_only=True)
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        from django.utils import timezone
+        if instance.end_date and instance.end_date < timezone.now().date():
+            data['status'] = 'completed'
+        return data
+
     class Meta:
         model = Event
         fields = [

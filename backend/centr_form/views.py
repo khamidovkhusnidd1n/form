@@ -5,13 +5,13 @@ from django.http import HttpResponse
 
 def react_app_view(request):
     try:
-        # First try the root directory (cPanel deployment structure)
-        with open(os.path.join(settings.BASE_DIR, '..', 'index.html')) as f:
+        # First try the dist directory (local dev / production build structure)
+        with open(os.path.join(settings.BASE_DIR, '..', 'dist', 'index.html')) as f:
             return HttpResponse(f.read())
     except FileNotFoundError:
         try:
-            # Fallback to dist/index.html (local dev structure)
-            with open(os.path.join(settings.BASE_DIR, '..', 'dist', 'index.html')) as f:
+            # Fallback to the root directory (cPanel deployment structure)
+            with open(os.path.join(settings.BASE_DIR, '..', 'index.html')) as f:
                 return HttpResponse(f.read())
         except FileNotFoundError:
             return HttpResponse(

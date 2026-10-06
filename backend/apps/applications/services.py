@@ -27,6 +27,17 @@ class ApplicationService:
             application.translations.update(translations)
             update_fields.append('translations')
         application.save(update_fields=update_fields)
+        
+        if new_status == 'approved':
+            from apps.certificates.services import generate_certificate
+            from django.db import transaction
+            try:
+                with transaction.atomic():
+                    generate_certificate(application)
+            except Exception as e:
+                import logging
+                logging.error(f"Sertifikat yaratishda xatolik: {e}")
+                
         NotificationService.send_status_email(application, new_status)
         return application
 

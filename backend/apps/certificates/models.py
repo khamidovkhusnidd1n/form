@@ -26,6 +26,8 @@ class Certificate(BaseTimestampedModel):
 
     application = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='certificate')
     certificate_number = models.CharField(max_length=100, unique=True)
+    verification_token = models.CharField(max_length=64, unique=True, null=True, blank=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
     template = models.ForeignKey(CertificateTemplate, on_delete=models.SET_NULL, null=True, blank=True, related_name='certificates')
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     pdf_file = models.FileField(upload_to='certificates/', blank=True, null=True)

@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
     path('submit/', views.SubmitApplicationView.as_view(), name='submit_application'),
+    path('me/', views.MyApplicationListView.as_view(), name='my_applications'),
+    path('me/<int:pk>/reply/', views.UserReplyView.as_view(), name='user_reply'),
     path('track/<str:application_id>/', views.TrackApplicationView.as_view(), name='track_application'),
     path('admin/', views.AdminApplicationListView.as_view(), name='admin_applications'),
     path('admin/export/excel/', views.export_applications_excel, name='export_excel'),

@@ -1,7 +1,8 @@
-import random
+﻿import random
 import string
 from django.db import models
 from apps.events.models import Event
+from django.conf import settings
 
 
 def generate_application_id():
@@ -28,6 +29,7 @@ class Application(models.Model):
         REJECTED = 'rejected', 'Rad etildi'
 
     application_id = models.CharField(max_length=20, unique=True, default=generate_application_id, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='applications')
     event = models.ForeignKey(Event, on_delete=models.PROTECT, related_name='applications')
     
     class AttendanceType(models.TextChoices):
@@ -55,17 +57,18 @@ class Application(models.Model):
     abstract = models.TextField(null=True, blank=True)
 
     # Files
-    document = models.FileField(upload_to='applications/documents/', null=True, blank=True)
-    passport = models.FileField(upload_to='applications/passports/', null=True, blank=True)
-    photo = models.ImageField(upload_to='applications/photos/', null=True, blank=True)
+    document = models.FileField(upload_to='applications/documents/', null=True, blank=True, max_length=500)
+    passport = models.FileField(upload_to='applications/passports/', null=True, blank=True, max_length=500)
+    photo = models.ImageField(upload_to='applications/photos/', null=True, blank=True, max_length=500)
 
     # Generated files
-    invitation_pdf = models.FileField(upload_to='applications/invitations/', null=True, blank=True)
-    certificate_pdf = models.FileField(upload_to='applications/certificates/', null=True, blank=True)
+    invitation_pdf = models.FileField(upload_to='applications/invitations/', null=True, blank=True, max_length=500)
+    certificate_pdf = models.FileField(upload_to='applications/certificates/', null=True, blank=True, max_length=500)
 
     # Status
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.SUBMITTED)
     admin_comment = models.TextField(blank=True)
+    user_reply = models.TextField(blank=True, verbose_name="Foydalanuvchi javobi")
     attended = models.BooleanField(default=False)
 
     submitted_at = models.DateTimeField(auto_now_add=True)
@@ -79,4 +82,5 @@ class Application(models.Model):
         verbose_name_plural = "Arizalar"
 
     def __str__(self):
-        return f"{self.application_id} — {self.full_name}"
+        return f"{self.application_id} вЂ” {self.full_name}"
+

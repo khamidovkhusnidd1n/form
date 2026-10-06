@@ -12,6 +12,8 @@ import Textarea from '../../components/ui/Textarea';
 import Button from '../../components/ui/Button';
 import { getLocalizedRegions, generateApplicationId } from '../../lib/utils';
 import { useTranslation } from '../../i18n';
+import { useAuth } from '../../store/authStore';
+import AuthModal from '../../components/auth/AuthModal';
 import { useData } from '../../store/dataStore';
 import { getTranslatedContent } from '../../lib/translationService';
 import { PhoneInput } from 'react-international-phone';
@@ -20,6 +22,9 @@ import type { Application } from '../../types';
 import { Country, State, City } from 'country-state-city';
 
 export default function ApplicationFormPage() {
+  const { isAuthenticated } = useAuth();
+
+
   const [searchParams] = useSearchParams();
   const { t, language } = useTranslation();
   const { events, addApplication } = useData();
@@ -181,13 +186,34 @@ export default function ApplicationFormPage() {
       setSuccessId((realId as unknown as string) || id);
       toast.success(t('common.success'));
     } catch (e: any) {
-      // Show detailed backend error if available
       const data = e?.response?.data;
-      if (data) {
-        const messages = Object.entries(data)
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-          .join(' | ');
-        toast.error(messages || t('common.error') || 'Xatolik yuz berdi', { duration: 6000 });
+      if (data && typeof data === 'object') {
+        const fieldMap: any = {
+          event: 'Tadbir',
+          document: 'Hujjat (Maqola)',
+          passport_copy: 'Pasport',
+          passport: 'Pasport',
+          photo: 'Rasm',
+          email: 'Email',
+          phone: 'Telefon',
+          full_name: 'Ism-sharif',
+          non_field_errors: 'Xatolik',
+          detail: 'Xatolik'
+        };
+        
+        toast.error(
+          <div className="text-sm">
+            <strong className="block mb-2 font-bold text-red-700">Quyidagi xatoliklar topildi:</strong>
+            <ul className="list-disc pl-4 space-y-1 text-red-600">
+              {Object.entries(data).map(([k, v]: [string, any]) => (
+                <li key={k}>
+                  <span className="font-semibold">{fieldMap[k] || k}:</span> {Array.isArray(v) ? v.join(', ') : String(v)}
+                </li>
+              ))}
+            </ul>
+          </div>,
+          { duration: 8000, style: { maxWidth: '500px' } }
+        );
       } else {
         toast.error(t('common.error') || 'Xatolik yuz berdi');
       }
@@ -229,6 +255,9 @@ export default function ApplicationFormPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {!isAuthenticated && (
+        <AuthModal open={true} onClose={() => window.location.href = '/'} />
+      )}
       <div className="bg-gradient-to-r from-slate-900 to-[#1a56db] text-white py-12">
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="font-display text-3xl font-bold mb-2">{t('apply.title')}</h1>

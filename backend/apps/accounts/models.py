@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+﻿from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
 
@@ -24,13 +24,14 @@ class AdminUser(AbstractBaseUser, PermissionsMixin):
         SUPER_ADMIN = 'super_admin', 'Super Admin'
         ADMINISTRATOR = 'administrator', 'Administrator'
         MODERATOR = 'moderator', 'Moderator'
+        PARTICIPANT = 'participant', 'Ishtirokchi'
 
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255)
-    role = models.CharField(max_length=20, choices=Role.choices, default=Role.MODERATOR)
+    role = models.CharField(max_length=20, choices=Role.choices, default=Role.PARTICIPANT)
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(null=True, blank=True)
 
@@ -41,8 +42,8 @@ class AdminUser(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = 'admin_users'
-        verbose_name = "Administrator"
-        verbose_name_plural = "Administratorlar"
+        verbose_name = "Foydalanuvchi"
+        verbose_name_plural = "Foydalanuvchilar"
 
     def __str__(self):
         return f"{self.full_name} ({self.role})"

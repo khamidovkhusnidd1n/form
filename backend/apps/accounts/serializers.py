@@ -85,3 +85,60 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(list(exc.messages))
         return value
 
+
+class ParticipantRegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    class Meta:
+        model = AdminUser
+        fields = ['email', 'full_name', 'password']
+        
+    def validate_email(self, value):
+        if AdminUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Bu email allaqachon ro'yxatdan o'tgan.")
+        return value
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        # Generate username from email
+        email = validated_data['email']
+        username = email.split('@')[0]
+        base_username = username
+        counter = 1
+        while AdminUser.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+            
+        user = AdminUser(
+            username=username,
+            email=email,
+            full_name=validated_data.get('full_name', ''),
+            role=AdminUser.Role.PARTICIPANT,
+            is_staff=False,
+            is_superuser=False,
+            is_active=False  # Must be activated via OTP
+        )
+        user.set_password(password)
+        user.save()
+        return user
+
+class VerifyEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    otp = serializers.CharField(required=True, max_length=6)
+
+from django.contrib.auth import authenticate
+
+class EmailOrUsernameTokenObtainPairSerializer(CustomTokenObtainPairSerializer):
+    def validate(self, attrs):
+        username_or_email = attrs.get('username')
+        password = attrs.get('password')
+        
+        # Try to find user by email
+        try:
+            user = AdminUser.objects.get(email=username_or_email)
+            username = user.username
+        except AdminUser.DoesNotExist:
+            username = username_or_email
+            
+        attrs['username'] = username
+        return super().validate(attrs)

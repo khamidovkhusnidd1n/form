@@ -150,6 +150,18 @@ MEDIA_ROOT = BASE_DIR / config('MEDIA_ROOT', default='media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day',
+        'auth_register': '10/hour',
+        'auth_login': '20/hour',
+        'application_submit': '5/day',
+    },
+
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
@@ -173,6 +185,7 @@ REST_FRAMEWORK = {
         'anon': '120/minute',
         'user': '600/minute',
         'auth_login': '5/minute',
+        'auth_register': '10/minute',
         'auth_password': '5/minute',
         'application_submit': '10/minute',
         'application_track': '30/minute',

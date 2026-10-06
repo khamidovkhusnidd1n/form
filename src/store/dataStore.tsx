@@ -149,11 +149,10 @@ function getInitialData<T>(key: string, fallback: T): T {
 }
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [events, setEvents] = useState<Event[]>(() => getInitialData(STORAGE_KEYS.EVENTS, MOCK_EVENTS));
-  const [faqs, setFaqs] = useState<FAQ[]>(() => getInitialData(STORAGE_KEYS.FAQS, MOCK_FAQS));
-  const [applications, setApplications] = useState<Application[]>(() =>
-    getInitialData(STORAGE_KEYS.APPLICATIONS, MOCK_APPLICATIONS)
-  );
+  const [events, setEvents] = useState<Event[]>(() => getInitialData(STORAGE_KEYS.EVENTS, []));
+  const [faqs, setFaqs] = useState<FAQ[]>(() => getInitialData(STORAGE_KEYS.FAQS, []));
+  const [applications, setApplications] = useState<Application[]>(() => getInitialData(STORAGE_KEYS.APPLICATIONS, []));
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -161,7 +160,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const rawList = extractResults(res.data);
       setEvents(rawList.map(transformEvent));
     } catch (err) {
-      console.warn('Failed to fetch events from API, using fallback data:', err);
+      console.warn('Failed to fetch events from API:', err);
     }
   }, []);
 
@@ -171,7 +170,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const rawList = extractResults(res.data);
       setFaqs(rawList.map(transformFAQ));
     } catch (err) {
-      console.warn('Failed to fetch FAQs from API, using fallback data:', err);
+      console.warn('Failed to fetch FAQs from API:', err);
     }
   }, []);
 
@@ -183,14 +182,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const rawList = extractResults(res.data);
       setApplications(rawList.map(transformApplication));
     } catch (err) {
-      console.warn('Failed to fetch applications from API, using fallback data:', err);
+      console.warn('Failed to fetch applications from API:', err);
     }
   }, []);
 
   useEffect(() => {
-    fetchEvents();
-    fetchFaqs();
-    fetchApplications();
+    Promise.all([fetchEvents(), fetchFaqs(), fetchApplications()]).finally(() => {
+      setIsLoading(false);
+    });
   }, [fetchEvents, fetchFaqs, fetchApplications]);
 
   useEffect(() => {
@@ -247,9 +246,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       let backendMsg = 'Tadbir qo\'shishda xatolik yuz berdi';
       if (err?.response?.data) {
         if (typeof err.response.data === 'string') {
-          backendMsg = err.response.data.includes('<title>') 
-            ? err.response.data.split('<title>')[1].split('</title>')[0] 
-            : 'Server xatosi (500)';
+          backendMsg = 'Server xatosi (500)';
         } else {
           backendMsg = Object.values(err.response.data).flat().join(', ');
         }
@@ -289,9 +286,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       let backendMsg = 'Tadbirni yangilashda xatolik yuz berdi';
       if (err?.response?.data) {
         if (typeof err.response.data === 'string') {
-          backendMsg = err.response.data.includes('<title>') 
-            ? err.response.data.split('<title>')[1].split('</title>')[0] 
-            : 'Server xatosi (500)';
+          backendMsg = 'Server xatosi (500)';
         } else {
           backendMsg = Object.values(err.response.data).flat().join(', ');
         }

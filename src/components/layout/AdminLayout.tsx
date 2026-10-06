@@ -4,8 +4,15 @@ import ToastProvider from '../ui/Toast';
 import { useAuth } from '../../store/authStore';
 
 export default function AdminLayout() {
-  const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
+  const { isAuthenticated, user } = useAuth();
+  
+  // Faqat tizimga kirgan va ruxsati bor (admin) foydalanuvchilar kira oladi
+  const isAdmin = user && ['super_admin', 'administrator', 'moderator'].includes(user.role);
+
+  if (!isAuthenticated || !isAdmin) {
+    return <Navigate to="/admin/login" replace />;
+  }
+
   return (
     <>
       <ToastProvider />

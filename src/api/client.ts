@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getStoredAuth, clearStoredAuth } from '../store/authStore';
+import { getStoredAuth, clearStoredAuth, useAuthStore } from '../store/authStore';
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
@@ -46,12 +46,12 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const { refreshToken, user } = getStoredAuth();
+      const { refreshToken } = getStoredAuth();
       if (!refreshToken) {
         isRefreshing = false;
         clearStoredAuth();
-        if (typeof window !== 'undefined' && window.location.pathname !== '/admin/login') {
-          window.location.href = '/admin/login';
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+          window.location.href = window.location.pathname.startsWith('/admin') ? '/admin/login' : '/login';
         }
         return Promise.reject(err);
       }
@@ -66,12 +66,8 @@ apiClient.interceptors.response.use(
         // Depending on backend config, sometimes it gives a new refresh token too
         const newRefreshToken = res.data.refresh || refreshToken;
         
-        // Use setStoredAuth directly since we can't easily access useAuth hook here
-        localStorage.setItem('centr-form-auth', JSON.stringify({
-          user,
-          token: newAccessToken,
-          refreshToken: newRefreshToken
-        }));
+        // Update the global state via Zustand
+        useAuthStore.getState().updateTokens(newAccessToken, newRefreshToken);
         
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
@@ -79,8 +75,8 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         clearStoredAuth();
-        if (typeof window !== 'undefined' && window.location.pathname !== '/admin/login') {
-          window.location.href = '/admin/login';
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+          window.location.href = window.location.pathname.startsWith('/admin') ? '/admin/login' : '/login';
         }
         return Promise.reject(refreshError);
       } finally {
