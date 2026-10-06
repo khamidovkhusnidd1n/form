@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import Application
 from .services import ApplicationService
 
-MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
+MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # 50 MB
 ALLOWED_FILE_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'}
 
 
