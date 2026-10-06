@@ -19,12 +19,15 @@ from django.views.static import serve
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
+import os
+
 urlpatterns += [
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    re_path(r'^assets/(?P<path>.*)$', serve, {'document_root': os.path.join(settings.BASE_DIR, '..', 'assets')}),
 ]
 
 from .views import react_app_view
 
 urlpatterns += [
-    re_path(r'^(?!api/|media/|static/).*$', react_app_view),
+    re_path(r'^(?!api/|media/|static/|assets/).*$', react_app_view),
 ]
