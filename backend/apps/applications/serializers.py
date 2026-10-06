@@ -13,8 +13,6 @@ def validate_uploaded_file(file_obj, allowed_extensions=ALLOWED_FILE_EXTENSIONS,
     if file_obj.size == 0:
         raise serializers.ValidationError("Fayl bo'sh bo'lishi mumkin emas.")
     filename = file_obj.name or ""
-    if len(filename.split('.')) > 2:
-        raise serializers.ValidationError("Qo'shaloq fayl kengaytmasidan foydalanish taqiqlangan.")
     ext = os.path.splitext(filename)[1].lower()
     allowed_normalized = {e.lower() if e.startswith('.') else f".{e.lower()}" for e in allowed_extensions}
     if ext not in allowed_normalized:
