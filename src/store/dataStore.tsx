@@ -429,7 +429,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const deleteApplication = async (id: number) => {
     setApplications((prev) => prev.filter((item) => item.id !== id));
     try {
-      await apiClient.delete(`/applications/admin/${id}/`);
+      // Use bulk-delete with POST instead of DELETE method to avoid cPanel blocking DELETE requests
+      await apiClient.post(`/applications/admin/bulk-delete/`, { ids: [id] });
     } catch (err) {
       console.error('Failed to delete application', err);
       throw err;
