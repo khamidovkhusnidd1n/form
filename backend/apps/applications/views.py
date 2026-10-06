@@ -162,13 +162,16 @@ def update_application_status(request, pk):
 
     serializer = StatusUpdateSerializer(data=request.data)
     if serializer.is_valid():
-        ApplicationService.update_status(
-            application,
-            serializer.validated_data['status'],
-            serializer.validated_data.get('admin_comment', ''),
-            actor=getattr(request.user, 'username', 'admin'),
-            translations=serializer.validated_data.get('translations')
-        )
+        try:
+            ApplicationService.update_status(
+                application,
+                serializer.validated_data['status'],
+                serializer.validated_data.get('admin_comment', ''),
+                actor=getattr(request.user, 'username', 'admin'),
+                translations=serializer.validated_data.get('translations')
+            )
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail': "Holat muvaffaqiyatli o'zgartirildi", 'status': application.status})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -180,7 +183,13 @@ def bulk_delete_applications(request):
     if not isinstance(ids, list) or not ids:
         return Response({'detail': "Iltimos, o'chirish uchun arizalarni tanlang."}, status=status.HTTP_400_BAD_REQUEST)
     
-    deleted_count, _ = Application.objects.filter(id__in=ids).delete()
+    targets = Application.objects.filter(id__in=ids)
+    snapshot = [{'id': a.id, 'application_id': a.application_id, 'full_name': a.full_name} for a in targets]
+    deleted_count, _ = targets.delete()
+    ApplicationService.log_action(
+        getattr(request.user, 'username', 'admin'), 'delete',
+        [row['id'] for row in snapshot], {'applications': snapshot},
+    )
     return Response({'detail': f"{deleted_count} ta ariza muvaffaqiyatli o'chirildi."})
 
 
@@ -200,16 +209,24 @@ def bulk_status_applications(request):
     updated_count = 0
     actor = getattr(request.user, 'username', 'admin')
 
+    skipped = 0
     for app in applications:
-        ApplicationService.update_status(
-            app,
-            new_status,
-            admin_comment,
-            actor=actor
-        )
-        updated_count += 1
+        try:
+            ApplicationService.update_status(
+                app,
+                new_status,
+                admin_comment,
+                actor=actor
+            )
+            updated_count += 1
+        except ValueError:
+            skipped += 1
 
-    return Response({'detail': f"{updated_count} ta arizaning holati muvaffaqiyatli o'zgartirildi."})
+    return Response({
+        'detail': f"{updated_count} ta arizaning holati o'zgartirildi, {skipped} tasiga ruxsat berilmadi.",
+        'updated': updated_count,
+        'skipped': skipped,
+    })
 
 
 @api_view(['GET'])
@@ -261,8 +278,12 @@ from apps.accounts.permissions import IsModeratorOrAbove
 def check_in_application(request, pk):
     try:
         app = Application.objects.get(pk=pk)
+        if app.status != Application.Status.APPROVED:
+            return Response({'status': 'error', 'message': 'Faqat tasdiqlangan arizalar uchun.'}, status=400)
+        if app.attended:
+            return Response({'status': 'error', 'message': 'Bu ishtirokchi allaqachon kirgan.'}, status=409)
         app.attended = True
-        app.save()
+        app.save(update_fields=['attended'])
         return Response({'status': 'success', 'message': 'Application checked in successfully.'})
     except Application.DoesNotExist:
         return Response({'status': 'error', 'message': 'Application not found.'}, status=404)

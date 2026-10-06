@@ -19,7 +19,7 @@ export default function CheckInPage() {
       })
       .catch((err) => {
         setStatus('error');
-        setMessage(err.response?.data?.message || 'Check-in failed');
+        setMessage(err.response?.data?.message || err.response?.data?.detail || 'Check-in failed');
       });
   }, [id]);
 

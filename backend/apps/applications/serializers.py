@@ -4,6 +4,14 @@ from .models import Application
 from .services import ApplicationService
 
 MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # 50 MB
+FILE_SIGNATURES = {
+    '.pdf': (b'%PDF-',),
+    '.png': (b'\x89PNG\r\n\x1a\n',),
+    '.jpg': (b'\xff\xd8\xff',),
+    '.jpeg': (b'\xff\xd8\xff',),
+    '.doc': (b'\xd0\xcf\x11\xe0',),
+    '.docx': (b'PK\x03\x04',),
+}
 ALLOWED_FILE_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'}
 
 
@@ -21,6 +29,12 @@ def validate_uploaded_file(file_obj, allowed_extensions=ALLOWED_FILE_EXTENSIONS,
     if file_obj.size > max_size_bytes:
         max_mb = max_size_bytes // (1024 * 1024)
         raise serializers.ValidationError(f"Fayl hajmi {max_mb}MB dan oshmasligi kerak.")
+    signatures = FILE_SIGNATURES.get(ext)
+    if signatures:
+        head = file_obj.read(8)
+        file_obj.seek(0)
+        if not any(head.startswith(sig) for sig in signatures):
+            raise serializers.ValidationError("Fayl mazmuni uning kengaytmasiga mos kelmaydi.")
     return file_obj
 
 

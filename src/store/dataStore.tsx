@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 import type { Event, FAQ, Application } from '../types';
 import { MOCK_EVENTS, MOCK_FAQS, MOCK_APPLICATIONS } from '../lib/mockData';
 import { apiClient } from '../api/client';
-import { getStoredAuth } from './authStore';
+import { getStoredAuth, useAuthStore } from './authStore';
 import toast from 'react-hot-toast';
 
 const STORAGE_KEYS = {
@@ -151,7 +151,9 @@ function getInitialData<T>(key: string, fallback: T): T {
 export function DataProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<Event[]>(() => getInitialData(STORAGE_KEYS.EVENTS, []));
   const [faqs, setFaqs] = useState<FAQ[]>(() => getInitialData(STORAGE_KEYS.FAQS, []));
-  const [applications, setApplications] = useState<Application[]>(() => getInitialData(STORAGE_KEYS.APPLICATIONS, []));
+  // Applications contain personal data: keep in memory only, never in localStorage.
+  const [applications, setApplications] = useState<Application[]>([]);
+  const authToken = useAuthStore((state) => state.token);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchEvents = useCallback(async () => {
@@ -187,10 +189,28 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    Promise.all([fetchEvents(), fetchFaqs(), fetchApplications()]).finally(() => {
+    Promise.all([fetchEvents(), fetchFaqs()]).finally(() => {
       setIsLoading(false);
     });
-  }, [fetchEvents, fetchFaqs, fetchApplications]);
+  }, [fetchEvents, fetchFaqs]);
+
+  // Load applications when an admin logs in; wipe them on logout.
+  useEffect(() => {
+    if (authToken) {
+      fetchApplications();
+    } else {
+      setApplications([]);
+    }
+  }, [authToken, fetchApplications]);
+
+  // One-time cleanup of personal data stored by older versions.
+  useEffect(() => {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.APPLICATIONS);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -207,14 +227,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
       // quota exception
     }
   }, [faqs]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(applications));
-    } catch {
-      // quota exception
-    }
-  }, [applications]);
 
   const addEvent = async (e: Event) => {
     const previousEvents = [...events];

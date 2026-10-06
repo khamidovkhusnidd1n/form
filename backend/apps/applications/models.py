@@ -84,3 +84,17 @@ class Application(models.Model):
     def __str__(self):
         return f"{self.application_id} вЂ” {self.full_name}"
 
+
+class ApplicationAuditLog(models.Model):
+    actor = models.CharField(max_length=150)
+    action = models.CharField(max_length=30)
+    application_ids = models.JSONField(default=list)
+    details = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'application_audit_logs'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.created_at:%Y-%m-%d %H:%M} {self.actor} {self.action}"
