@@ -64,7 +64,7 @@ export default function UserCabinet() {
       ) : (
         <div className="space-y-6">
           {apps.map((app: any) => (
-            <div key={app.id} className="bg-white shadow rounded-xl p-6 border border-slate-100">
+            <div key={app.application_id || app.id} className="bg-white shadow rounded-xl p-6 border border-slate-100">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <div className="text-sm text-slate-500 mb-1">ID: {app.application_id}</div>
@@ -129,12 +129,12 @@ export default function UserCabinet() {
                       rows={1}
                       style={{ minHeight: '50px' }}
                       placeholder="Adminga javob yozish..."
-                      value={replyText[app.id] || ''}
-                      onChange={(e) => setReplyText({ ...replyText, [app.id]: e.target.value })}
+                      value={replyText[app.application_id || app.id] || ''}
+                      onChange={(e) => setReplyText({ ...replyText, [app.application_id || app.id]: e.target.value })}
                     />
                     <button 
-                      onClick={() => handleReplySubmit(app.id)}
-                      disabled={!replyText[app.id]}
+                      onClick={() => handleReplySubmit(app.application_id || app.id)}
+                      disabled={!replyText[app.application_id || app.id]}
                       className="bg-indigo-600 text-white p-3 rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center shrink-0 shadow-sm"
                       title="Jo'natish"
                     >

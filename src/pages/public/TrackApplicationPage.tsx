@@ -10,6 +10,9 @@ import type { Application, ApplicationStatus } from '../../types';
 import { useTranslation } from '../../i18n';
 import { useData } from '../../store/dataStore';
 import { getTranslatedContent } from '../../lib/translationService';
+import { apiClient } from '../../api/client';
+// Expose for handleSearch
+(window as any).__apiClient = apiClient;
 
 export default function TrackApplicationPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,6 +20,7 @@ export default function TrackApplicationPage() {
   const { applications } = useData();
 
   const [query, setQuery] = useState(searchParams.get('id') || '');
+  const [phone, setPhone] = useState('');
   const [result, setResult] = useState<Application | null | 'not_found'>(null);
   const [loading, setLoading] = useState(false);
 
@@ -27,11 +31,21 @@ export default function TrackApplicationPage() {
   ];
 
   const handleSearch = async (id: string) => {
-    if (!id.trim()) return;
+    if (!id.trim() || !phone.trim()) return;
     setLoading(true);
     setSearchParams({ id });
-    const rawFound = applications.find(a => a.applicationId.toLowerCase() === id.trim().toLowerCase());
-    setResult(rawFound ? getTranslatedContent(rawFound, language) : 'not_found');
+    try {
+      // Import apiClient at top if not there
+      const res = await window.__apiClient.get(`/applications/track/${id.trim()}/?phone=${encodeURIComponent(phone.trim())}`);
+      setResult(getTranslatedContent(res.data, language));
+    } catch (err: any) {
+      if (err.response?.status === 404 || err.response?.status === 400) {
+        setResult('not_found');
+      } else {
+        console.error(err);
+        setResult('not_found');
+      }
+    }
     setLoading(false);
   };
 
