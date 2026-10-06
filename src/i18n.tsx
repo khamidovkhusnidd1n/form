@@ -11,6 +11,8 @@ export const translations = {
     'nav.track': 'Ariza holati',
     'nav.faq': "Ko'p so'raladigan savollar",
     'nav.admin': 'Admin',
+    'nav.login': 'Kirish',
+    'nav.cabinet': 'Kabinet',
     'nav.language': 'Til',
     'nav.dashboard': 'Dashboard',
     'nav.applications': 'Arizalar',

@@ -18,7 +18,7 @@ const NAV_LINKS = [
 const LANGUAGES: Language[] = ['uz', 'ru', 'en'];
 
 export default function Navbar() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const location = useLocation();
@@ -56,11 +56,11 @@ export default function Navbar() {
             <div className="hidden lg:flex items-center gap-2 border-r pr-4">
               {isAuthenticated ? (
                 <>
-                  <Link to="/cabinet" className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">Kabinet</Link>
-                  <button onClick={() => { localStorage.removeItem('centr-form-auth'); window.location.href='/'; }} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">Chiqish</button>
+                  <Link to="/cabinet" className="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">{t('nav.cabinet')}</Link>
+                  <button onClick={() => { logout(); window.location.href = '/'; }} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">{t('nav.logout')}</button>
                 </>
               ) : (
-                <Link to="/login" className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Kirish</Link>
+                <Link to="/login" className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">{t('nav.login')}</Link>
               )}
             </div>
             <div className="relative hidden sm:block">
@@ -118,6 +118,33 @@ export default function Navbar() {
               {t(link.key)}
             </Link>
           ))}
+          <div className="pt-2 border-t border-slate-100 mt-2">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/cabinet"
+                  onClick={() => setMobileOpen(false)}
+                  className="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100"
+                >
+                  {t('nav.cabinet')}
+                </Link>
+                <button
+                  onClick={() => { logout(); window.location.href = '/'; }}
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50"
+                >
+                  {t('nav.logout')}
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                className="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100"
+              >
+                {t('nav.login')}
+              </Link>
+            )}
+          </div>
           <div className="pt-2 border-t border-slate-100 mt-2">
             <p className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase">Til</p>
             {LANGUAGES.map((lang) => (
