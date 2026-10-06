@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { apiClient as api } from '../../api/client';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '../../i18n';
 import { MessageCircle, CheckCircle, Clock, XCircle, FileText, Send, User } from 'lucide-react';
 import { useAuth } from '../../store/authStore';
 
 export default function UserCabinet() {
-  const { t, i18n } = useTranslation();
+  const { t, language } = useTranslation();
   const [apps, setApps] = useState<any[]>([]);
   const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
   const { isAuthenticated, token } = useAuth();
@@ -78,7 +78,7 @@ export default function UserCabinet() {
                 </div>
               )}
 
-              {(app.admin_comment || (app.translations && app.translations[i18n.language]?.adminComment)) && (
+              {(app.admin_comment || (app.translations && app.translations[language]?.adminComment)) && (
                 <div className="mt-6 bg-slate-50/80 rounded-2xl border border-slate-200 p-5 overflow-hidden">
                   <div className="flex items-center gap-2 mb-4 text-slate-800 font-semibold border-b pb-3">
                     <MessageCircle className="w-5 h-5 text-indigo-500" />
@@ -94,7 +94,7 @@ export default function UserCabinet() {
                       <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm flex-1">
                         <div className="text-xs font-bold text-indigo-600 mb-1">Admin</div>
                         <p className="text-slate-700 text-sm whitespace-pre-wrap">
-                          {app.translations?.[i18n.language]?.adminComment || app.admin_comment}
+                          {app.translations?.[language]?.adminComment || app.admin_comment}
                         </p>
                       </div>
                     </div>
