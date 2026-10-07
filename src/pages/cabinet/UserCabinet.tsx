@@ -8,6 +8,7 @@ import { useAuth } from '../../store/authStore';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
+import { getApplicationStatusLabel, APPLICATION_STATUS_COLORS } from '../../lib/utils';
 
 export default function UserCabinet() {
   const { t, language } = useTranslation();
@@ -121,8 +122,8 @@ export default function UserCabinet() {
                   <h3 className="text-xl font-bold text-slate-800">{app.event_title}</h3>
                 </div>
                 <div className="text-right">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${app.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : app.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
-                    {app.status === 'approved' ? 'Tasdiqlangan' : app.status === 'rejected' ? 'Bekor qilingan' : 'Kutilmoqda'}
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${APPLICATION_STATUS_COLORS[app.status] || 'bg-slate-100 text-slate-700'}`}>
+                    {getApplicationStatusLabel(app.status, language)}
                   </span>
                 </div>
               </div>
