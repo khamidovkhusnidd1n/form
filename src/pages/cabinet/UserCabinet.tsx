@@ -127,18 +127,16 @@ export default function UserCabinet() {
               </div>
               
               <div className="flex gap-2">
-                {(app.status === 'rejected' || app.status === 'info_required') && (
-                  <button 
-                    onClick={() => {
-                      setEditingApp(app);
-                      setEditData({});
-                    }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                    Tahrirlash
-                  </button>
-                )}
+                <button 
+                  onClick={() => {
+                    setEditingApp(app);
+                    setEditData({});
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Tahrirlash
+                </button>
               </div>
               
               {app.status === 'approved' && app.certificate_pdf && (
@@ -215,6 +213,11 @@ export default function UserCabinet() {
       <Modal isOpen={!!editingApp} onClose={() => setEditingApp(null)} title="Arizani tahrirlash">
         {editingApp && (
           <div className="space-y-4 pt-4">
+            {editingApp.status === 'approved' && (
+              <div className="text-sm text-amber-700 mb-4 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                <strong>Ogohlantirish:</strong> Bu ariza tasdiqlangan va sertifikat berilgan. Agar siz uni tahrirlasangiz, u qaytadan "Kutilmoqda" holatiga o'tadi va mavjud sertifikat bekor qilinadi.
+              </div>
+            )}
             <div className="text-sm text-slate-500 mb-4 bg-blue-50 p-3 rounded-lg border border-blue-100">
               Faqat o'zgartirish kerak bo'lgan maydonlarni to'ldiring. Fayllarni yangilash uchun yangi fayl yuklang.
             </div>
