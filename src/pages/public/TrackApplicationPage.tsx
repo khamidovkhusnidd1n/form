@@ -73,13 +73,7 @@ export default function TrackApplicationPage() {
               placeholder="Ariza ID (CF-2026-...)"
               className="flex-1 bg-white rounded-xl border-0 px-5 py-3.5 text-slate-800 font-mono text-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
-              placeholder="Telefon raqam"
-              className="flex-1 bg-white rounded-xl border-0 px-5 py-3.5 text-slate-800 font-mono text-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            
             <Button size="lg" loading={loading} onClick={() => handleSearch(query)} disabled={!query.trim() || loading} icon={<Search className="w-5 h-5" />} className="shrink-0">
               {t('track.button')}
             </Button>
