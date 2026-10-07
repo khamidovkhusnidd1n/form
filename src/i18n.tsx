@@ -918,6 +918,23 @@ ru: {
     'common.autoTranslating': 'Перевод на все языки...',
     'common.autoTranslatedSuccess': 'Успешно переведено!',
     'common.confirmDelete': 'Вы уверены, что хотите удалить? Это действие нельзя отменить.',
+
+    // Cabinet additions
+    'cabinet.edit': 'Редактировать',
+    'cabinet.editTitle': 'Редактировать заявку',
+    'cabinet.editSuccess': 'Заявка успешно изменена!',
+    'cabinet.editError': 'Ошибка при редактировании',
+    'cabinet.downloadCert': 'Скачать сертификат',
+    'cabinet.warning': 'Предупреждение',
+    'cabinet.warningApproved': 'Эта заявка одобрена и сертификат выдан. Если вы ее измените, она вернется в статус «В ожидании», а текущий сертификат будет аннулирован.',
+    'cabinet.editNote': 'Заполните только те поля, которые нужно изменить. Загрузите новый файл для обновления.',
+    'cabinet.attendanceType': 'Форма участия',
+    'cabinet.docLabel': 'Файл статьи (Doc/Docx)',
+    'cabinet.passportLabel': 'Копия паспорта (PDF/Изображение)',
+    'cabinet.cancel': 'Отмена',
+    'cabinet.saveAndSubmit': 'Сохранить и отправить',
+    'cabinet.noCertMsg': 'Сертификаты еще не добавлены, пожалуйста подождите.',
+    'cabinet.understood': 'Понятно',
   },
 } as const;
 
@@ -971,20 +988,3 @@ export function useTranslation() {
   }
   return context;
 }
-    // Cabinet additions
-    'cabinet.edit': 'Редактировать',
-    'cabinet.editTitle': 'Редактировать заявку',
-    'cabinet.editSuccess': 'Заявка успешно изменена!',
-    'cabinet.editError': 'Ошибка при редактировании',
-    'cabinet.downloadCert': 'Скачать сертификат',
-    'cabinet.warning': 'Предупреждение',
-    'cabinet.warningApproved': 'Эта заявка одобрена и сертификат выдан. Если вы ее измените, она вернется в статус «В ожидании», а текущий сертификат будет аннулирован.',
-    'cabinet.editNote': 'Заполните только те поля, которые нужно изменить. Загрузите новый файл для обновления.',
-    'cabinet.attendanceType': 'Форма участия',
-    'cabinet.docLabel': 'Файл статьи (Doc/Docx)',
-    'cabinet.passportLabel': 'Копия паспорта (PDF/Изображение)',
-    'cabinet.cancel': 'Отмена',
-    'cabinet.saveAndSubmit': 'Сохранить и отправить',
-    'cabinet.noCertMsg': 'Сертификаты еще не добавлены, пожалуйста подождите.',
-    'cabinet.understood': 'Понятно',
-
