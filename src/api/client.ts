@@ -3,7 +3,12 @@ import { getStoredAuth, clearStoredAuth, useAuthStore } from '../store/authStore
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  },
 });
 
 apiClient.interceptors.request.use((config) => {

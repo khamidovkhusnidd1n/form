@@ -9,24 +9,36 @@ import { useAuth } from '../../store/authStore';
 export default function UserCabinet() {
   const { t, language } = useTranslation();
   const [apps, setApps] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
   const { isAuthenticated, token } = useAuth();
   
   const fetchApps = () => {
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     
+    setLoading(true);
     api.get('/applications/me/', {
       headers: { Authorization: 'Bearer ' + token  }
-    }).then(res => setApps(res.data.results || res.data))
-      .catch(err => {
-        console.error(err);
-        toast.error("Arizalarni yuklashda xatolik yuz berdi");
-      });
+    }).then(res => {
+      setApps(res.data.results || res.data);
+    })
+    .catch(err => {
+      console.error(err);
+      toast.error("Arizalarni yuklashda xatolik yuz berdi");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
   };
 
   useEffect(() => {
     if (isAuthenticated && token) {
       fetchApps();
+    } else {
+      setLoading(false);
     }
   }, [isAuthenticated, token]);
 
@@ -53,7 +65,12 @@ export default function UserCabinet() {
     <div className="max-w-5xl mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-6 text-slate-800">Mening Kabinetim</h1>
       
-      {apps.length === 0 ? (
+      {loading ? (
+        <div className="bg-white shadow-sm rounded-2xl p-12 text-center border border-slate-100 flex flex-col items-center justify-center">
+          <div className="w-12 h-12 border-4 border-[#1a56db] border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-slate-500">Arizalar yuklanmoqda...</p>
+        </div>
+      ) : apps.length === 0 ? (
         <div className="bg-white shadow-sm rounded-2xl p-12 text-center border border-slate-100 flex flex-col items-center justify-center">
           <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
             <FileText className="w-8 h-8 text-slate-400" />
