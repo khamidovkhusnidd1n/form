@@ -209,7 +209,7 @@ export default function UserCabinet() {
         </div>
       )}
 
-      <Modal isOpen={!!editingApp} onClose={() => setEditingApp(null)} title="Arizani tahrirlash">
+      <Modal open={!!editingApp} onClose={() => setEditingApp(null)} title="Arizani tahrirlash">
         {editingApp && (
           <div className="space-y-4 pt-4">
             {editingApp.status === 'approved' && (
@@ -354,7 +354,7 @@ export default function UserCabinet() {
         )}
       </Modal>
 
-      <Modal isOpen={missingCertModal} onClose={() => setMissingCertModal(false)} title="Ogohlantirish">
+      <Modal open={missingCertModal} onClose={() => setMissingCertModal(false)} title="Ogohlantirish">
         <div className="py-6 text-center">
           <p className="text-slate-700 font-medium text-lg">
             Hali sertifikatlar kiritilmadi, iltimos kuting.
