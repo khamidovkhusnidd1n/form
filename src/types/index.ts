@@ -1,7 +1,7 @@
 export type EventType = 'conference' | 'forum' | 'exhibition' | 'symposium' | 'workshop' | 'seminar' | 'article_call';
 export type EventFormat = 'online' | 'offline' | 'hybrid';
 export type EventStatus = 'planned' | 'ongoing' | 'completed';
-export type ApplicationStatus = 'submitted' | 'under_review' | 'info_required' | 'approved' | 'rejected';
+export type ApplicationStatus = 'submitted' | 'edited' | 'under_review' | 'info_required' | 'approved' | 'rejected';
 export type AttendanceType = 'online' | 'offline';
 export type UserRole = 'super_admin' | 'administrator' | 'moderator';
 export type Gender = 'male' | 'female';

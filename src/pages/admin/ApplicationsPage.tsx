@@ -225,7 +225,7 @@ export default function ApplicationsPage() {
             />
           </div>
           <div className="flex gap-2 flex-wrap items-center">
-            {(['all', 'submitted', 'under_review', 'info_required', 'approved', 'rejected'] as const).map(s => (
+            {(['all', 'submitted', 'edited', 'under_review', 'info_required', 'approved', 'rejected'] as const).map(s => (
               <button
                 key={s}
                 onClick={() => { setStatusFilter(s); setPage(1); }}

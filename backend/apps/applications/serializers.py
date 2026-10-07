@@ -188,8 +188,8 @@ class ApplicationUserEditSerializer(serializers.ModelSerializer):
         instance.is_edited = True
         instance.edit_count = (instance.edit_count or 0) + 1
         instance.edited_at = timezone.now()
-        # Edited application goes back to the review queue
-        instance.status = Application.Status.SUBMITTED
+        # Edited application gets the separate EDITED status
+        instance.status = getattr(Application.Status, 'EDITED', 'edited')
         if had_certificate:
             instance.certificate_pdf = None
         instance.save()
