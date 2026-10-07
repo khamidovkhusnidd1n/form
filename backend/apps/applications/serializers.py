@@ -216,10 +216,27 @@ class ApplicationAdminSerializer(serializers.ModelSerializer):
     passport_url = serializers.SerializerMethodField()
     photo_url = serializers.SerializerMethodField()
     invitation_pdf_url = serializers.SerializerMethodField()
+    certificate_pdf_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Application
         fields = '__all__'
+
+    def get_certificate_pdf_url(self, obj):
+        if obj.status != 'approved':
+            return None
+        if not obj.certificate_pdf:
+            try:
+                from apps.certificates.services import generate_certificate
+                generate_certificate(obj)
+                obj.refresh_from_db(fields=['certificate_pdf'])
+            except Exception:
+                return None
+        pdf = obj.certificate_pdf
+        if not pdf:
+            return None
+        req = self.context.get('request')
+        return req.build_absolute_uri(pdf.url) if req else pdf.url
 
     def get_document_url(self, obj):
         req = self.context.get('request')

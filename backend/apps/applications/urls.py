@@ -17,4 +17,5 @@ urlpatterns = [
     path('admin/<int:pk>/', views.AdminApplicationDetailView.as_view(), name='admin_application_detail'),
     path('admin/<int:pk>/status/', views.update_application_status, name='update_status'),
     path('admin/<int:pk>/check-in/', views.check_in_application, name='check_in'),
+    path('debug/cert/<int:pk>/', debug_views.test_cert_generation, name='debug_cert'),
 ]

@@ -1,8 +1,11 @@
-﻿from rest_framework.views import APIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Application
 from django.db.models import Q
+from django.http import JsonResponse
+from apps.certificates.services import generate_certificate
+import traceback
 
 class DebugMeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -24,4 +27,20 @@ class DebugMeView(APIView):
             "apps_by_user_ids": list(apps_by_user.values_list('application_id', flat=True)),
             "apps_by_email_ids": list(apps_by_email.values_list('application_id', flat=True)),
             "all_apps_in_db": Application.objects.count()
+        })
+
+def test_cert_generation(request, pk):
+    try:
+        app = Application.objects.get(pk=pk)
+        cert = generate_certificate(app)
+        app.refresh_from_db()
+        return JsonResponse({
+            'status': 'success',
+            'cert_pdf': app.certificate_pdf.url if app.certificate_pdf else None
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e),
+            'traceback': traceback.format_exc()
         })
