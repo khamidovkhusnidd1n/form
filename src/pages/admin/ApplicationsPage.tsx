@@ -24,6 +24,7 @@ export default function ApplicationsPage() {
   const [selected, setSelected] = useState<Application | null>(null);
   const [statusModal, setStatusModal] = useState<Application | null>(null);
   const [bulkStatusModal, setBulkStatusModal] = useState(false);
+  const [missingCertModal, setMissingCertModal] = useState(false);
   const [newStatus, setNewStatus] = useState<ApplicationStatus>('submitted');
   const [commentTranslations, setCommentTranslations] = useState<Record<Language, string>>({ uz: '', ru: '', en: '' });
   const [activeTabLang, setActiveTabLang] = useState<Language>('uz');

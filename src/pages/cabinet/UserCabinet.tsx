@@ -15,6 +15,7 @@ export default function UserCabinet() {
   const [loading, setLoading] = useState(true);
   const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
   const [editingApp, setEditingApp] = useState<any | null>(null);
+  const [missingCertModal, setMissingCertModal] = useState(false);
   const [editData, setEditData] = useState<any>({});
   const { isAuthenticated, token } = useAuth();
   
@@ -138,10 +139,16 @@ export default function UserCabinet() {
                   Tahrirlash
                 </button>
               
-                {app.status === 'approved' && app.certificate_pdf && (
-                  <a href={app.certificate_pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
-                    Sertifikatni yuklab olish
-                  </a>
+                {app.status === 'approved' && (
+                  app.certificate_pdf ? (
+                    <a href={app.certificate_pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
+                      Sertifikatni yuklab olish
+                    </a>
+                  ) : (
+                    <button onClick={() => setMissingCertModal(true)} className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
+                      Sertifikatni yuklab olish
+                    </button>
+                  )
                 )}
               </div>
 
@@ -224,13 +231,13 @@ export default function UserCabinet() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input 
                 label="F.I.SH (Ism familiya)" 
-                defaultValue={editingApp.fullName}
+                defaultValue={editingApp.full_name || editingApp.fullName}
                 onChange={(e) => setEditData({...editData, full_name: e.target.value})} 
               />
               <Input 
                 label="Tug'ilgan sana" 
                 type="date"
-                defaultValue={editingApp.dateOfBirth}
+                defaultValue={editingApp.date_of_birth || editingApp.dateOfBirth}
                 onChange={(e) => setEditData({...editData, date_of_birth: e.target.value})} 
               />
               <div className="flex flex-col gap-1.5">
@@ -272,12 +279,12 @@ export default function UserCabinet() {
               />
               <Input 
                 label="Viloyat" 
-                defaultValue={editingApp.regionName}
+                defaultValue={editingApp.region || editingApp.regionName}
                 onChange={(e) => setEditData({...editData, region: e.target.value})} 
               />
               <Input 
                 label="Tuman/Shahar" 
-                defaultValue={editingApp.districtName}
+                defaultValue={editingApp.district || editingApp.districtName}
                 onChange={(e) => setEditData({...editData, district: e.target.value})} 
               />
               <div className="flex flex-col gap-1.5">
@@ -351,6 +358,20 @@ export default function UserCabinet() {
             </div>
           </div>
         )}
+      </Modal>
+
+      <Modal isOpen={missingCertModal} onClose={() => setMissingCertModal(false)} title="Ogohlantirish">
+        <div className="py-6 text-center">
+          <p className="text-slate-700 font-medium text-lg">
+            Hali sertifikatlar kiritilmadi, iltimos kuting.
+          </p>
+          <button 
+            onClick={() => setMissingCertModal(false)}
+            className="mt-6 px-6 py-2 bg-[#1a56db] text-white font-medium rounded-xl hover:bg-blue-700"
+          >
+            Tushundim
+          </button>
+        </div>
       </Modal>
     </div>
   );
