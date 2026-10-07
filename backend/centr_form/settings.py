@@ -234,7 +234,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tashkent'
 
-FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8443')
+FRONTEND_URL = config('FRONTEND_URL', default='https://form.uzbamalaka.uz')
 
 # Cookie security settings
 SESSION_COOKIE_HTTPONLY = True
