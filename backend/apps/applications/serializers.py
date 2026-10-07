@@ -88,6 +88,7 @@ class ApplicationSubmitSerializer(serializers.ModelSerializer):
 
 class ApplicationStatusSerializer(serializers.ModelSerializer):
     event_title = serializers.CharField(source='event.title', read_only=True)
+    certificate_pdf = serializers.SerializerMethodField()
 
     class Meta:
         model = Application
@@ -98,6 +99,25 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
             'invitation_pdf', 'certificate_pdf',
         ]
         read_only_fields = fields
+
+    def get_certificate_pdf(self, obj):
+        """Return certificate URL; self-heal if approved but certificate missing."""
+        if obj.status != 'approved':
+            return None
+        pdf = obj.certificate_pdf
+        if not pdf:
+            try:
+                from apps.certificates.services import generate_certificate
+                cert = generate_certificate(obj)
+                pdf = cert.pdf_file or obj.certificate_pdf
+            except Exception:
+                import logging
+                logging.getLogger(__name__).exception("Sertifikatni yaratib bo'lmadi")
+                return None
+        if not pdf:
+            return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(pdf.url) if request else pdf.url
 
 
 class ApplicationAdminSerializer(serializers.ModelSerializer):
