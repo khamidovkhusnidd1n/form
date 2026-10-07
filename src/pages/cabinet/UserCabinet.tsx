@@ -323,19 +323,7 @@ export default function UserCabinet() {
               />
             </div>
 
-            <div className="space-y-3 pt-2">
-              <label className="block text-sm font-medium text-slate-700">{t("cabinet.passportLabel")}</label>
-              <input 
-                type="file" 
-                accept=".pdf,image/*"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setEditData({...editData, passport: e.target.files[0]});
-                  }
-                }}
-                className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-              />
-            </div>
+            
 
             <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
               <button 

@@ -476,8 +476,8 @@ export default function ApplicationFormPage() {
                   <h2 className="font-bold text-slate-800 text-lg mb-5">{t('apply.documents')}</h2>
                   {[
                     { key: 'document' as const, label: t('apply.docThesis'), hint: t('apply.docThesisHint'), required: true, accept: ".pdf,.docx,.doc" },
-                    { key: 'passport' as const, label: t('apply.docPassport'), hint: t('apply.docPassportHint'), required: false, accept: ".jpg,.jpeg,.png,.pdf" },
-                    { key: 'photo' as const, label: t('apply.docPhoto'), hint: t('apply.docPhotoHint'), required: false, accept: ".jpg,.jpeg,.png" },
+                    
+                    
                   ].map(({ key, label, hint, required, accept }) => (
                     <div key={key}>
                       <label className="block text-sm font-medium text-slate-700 mb-1.5">
