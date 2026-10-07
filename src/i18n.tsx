@@ -303,7 +303,24 @@ export const translations = {
     'common.autoTranslating': 'Barcha tillarga tarjima qilinmoqda...',
     'common.autoTranslatedSuccess': 'Muvaffaqiyatli tarjima qilindi!',
   },
-  en: {
+  
+    // Cabinet additions
+    'cabinet.edit': 'Tahrirlash',
+    'cabinet.editTitle': 'Arizani tahrirlash',
+    'cabinet.editSuccess': 'Ariza muvaffaqiyatli tahrirlandi!',
+    'cabinet.editError': 'Tahrirlashda xatolik yuz berdi',
+    'cabinet.downloadCert': 'Sertifikatni yuklab olish',
+    'cabinet.warning': 'Ogohlantirish',
+    'cabinet.warningApproved': 'Bu ariza tasdiqlangan va sertifikat berilgan. Agar siz uni tahrirlasangiz, u qaytadan "Kutilmoqda" holatiga o\'tadi va mavjud sertifikat bekor qilinadi.',
+    'cabinet.editNote': 'Faqat o\'zgartirish kerak bo\'lgan maydonlarni to\'ldiring. Fayllarni yangilash uchun yangi fayl yuklang.',
+    'cabinet.attendanceType': 'Ishtirok etish shakli',
+    'cabinet.docLabel': 'Maqola fayli (Doc/Docx)',
+    'cabinet.passportLabel': 'Pasport nusxasi (PDF/Rasm)',
+    'cabinet.cancel': 'Bekor qilish',
+    'cabinet.saveAndSubmit': 'Saqlash va Yuborish',
+    'cabinet.noCertMsg': 'Hali sertifikatlar kiritilmadi, iltimos kuting.',
+    'cabinet.understood': 'Tushundim',
+en: {
     // Navigation
     'nav.home': 'Home',
     'nav.events': 'Events',
@@ -601,7 +618,24 @@ export const translations = {
     'common.autoTranslating': 'Translating into all languages...',
     'common.autoTranslatedSuccess': 'Successfully translated!',
   },
-  ru: {
+  
+    // Cabinet additions
+    'cabinet.edit': 'Edit',
+    'cabinet.editTitle': 'Edit Application',
+    'cabinet.editSuccess': 'Application successfully edited!',
+    'cabinet.editError': 'Error occurred while editing',
+    'cabinet.downloadCert': 'Download Certificate',
+    'cabinet.warning': 'Warning',
+    'cabinet.warningApproved': 'This application is approved and a certificate is issued. If you edit it, it will return to "Pending" status and the current certificate will be canceled.',
+    'cabinet.editNote': 'Only fill out the fields you want to change. Upload a new file to replace the existing one.',
+    'cabinet.attendanceType': 'Attendance Type',
+    'cabinet.docLabel': 'Article file (Doc/Docx)',
+    'cabinet.passportLabel': 'Passport copy (PDF/Image)',
+    'cabinet.cancel': 'Cancel',
+    'cabinet.saveAndSubmit': 'Save and Submit',
+    'cabinet.noCertMsg': 'Certificates are not added yet, please wait.',
+    'cabinet.understood': 'Understood',
+ru: {
     // Navigation
     'nav.home': 'Главная',
     'nav.events': 'Мероприятия',
@@ -937,3 +971,20 @@ export function useTranslation() {
   }
   return context;
 }
+    // Cabinet additions
+    'cabinet.edit': 'Редактировать',
+    'cabinet.editTitle': 'Редактировать заявку',
+    'cabinet.editSuccess': 'Заявка успешно изменена!',
+    'cabinet.editError': 'Ошибка при редактировании',
+    'cabinet.downloadCert': 'Скачать сертификат',
+    'cabinet.warning': 'Предупреждение',
+    'cabinet.warningApproved': 'Эта заявка одобрена и сертификат выдан. Если вы ее измените, она вернется в статус «В ожидании», а текущий сертификат будет аннулирован.',
+    'cabinet.editNote': 'Заполните только те поля, которые нужно изменить. Загрузите новый файл для обновления.',
+    'cabinet.attendanceType': 'Форма участия',
+    'cabinet.docLabel': 'Файл статьи (Doc/Docx)',
+    'cabinet.passportLabel': 'Копия паспорта (PDF/Изображение)',
+    'cabinet.cancel': 'Отмена',
+    'cabinet.saveAndSubmit': 'Сохранить и отправить',
+    'cabinet.noCertMsg': 'Сертификаты еще не добавлены, пожалуйста подождите.',
+    'cabinet.understood': 'Понятно',
+

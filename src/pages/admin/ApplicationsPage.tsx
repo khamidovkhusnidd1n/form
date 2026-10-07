@@ -195,7 +195,7 @@ export default function ApplicationsPage() {
                 onClick={() => { setBulkStatusModal(true); setNewStatus('submitted'); }}
               >
                 <Edit2 className="w-4 h-4 mr-2" />
-                Statusni o'zgartirish ({selectedIds.size})
+                {t('admin.changeStatus', 'Change Status')} ({selectedIds.size})
               </Button>
               <Button
                 variant="secondary"
@@ -209,7 +209,7 @@ export default function ApplicationsPage() {
           )}
           <Button variant="outline" className="hidden sm:flex bg-white" onClick={handleExportExcel}>
             <Download className="w-4 h-4 mr-2" />
-            Excel ga yuklab olish
+            {t("admin.exportExcel", "Export to Excel")}
           </Button>
         </div>
       </div>
@@ -326,7 +326,7 @@ export default function ApplicationsPage() {
                         <button 
                           onClick={() => setMissingCertModal(true)} 
                           className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-500 transition-colors" 
-                          title="Sertifikatni yuklash"
+                          title={t("cabinet.downloadCert")}
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         </button>
@@ -519,7 +519,7 @@ export default function ApplicationsPage() {
       </Modal>
 
       {/* Bulk Status Change Modal */}
-      <Modal open={bulkStatusModal} onClose={() => setBulkStatusModal(false)} title="Statusni o'zgartirish" size="sm">
+      <Modal open={bulkStatusModal} onClose={() => setBulkStatusModal(false)} title="{t('admin.changeStatus', 'Change Status')}" size="sm">
         <div className="space-y-4">
           <p className="text-sm text-slate-600">Tanlangan arizalar soni: {selectedIds.size} ta</p>
           <div>

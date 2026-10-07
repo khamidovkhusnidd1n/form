@@ -79,11 +79,11 @@ export default function UserCabinet() {
           'Content-Type': 'multipart/form-data'
         }
       });
-      toast.success("Ariza muvaffaqiyatli tahrirlandi!");
+      toast.success(t("cabinet.editSuccess"));
       setEditingApp(null);
       fetchApps();
     } catch (e) {
-      toast.error("Tahrirlashda xatolik yuz berdi");
+      toast.error(t("cabinet.editError"));
     }
   };
 
@@ -137,12 +137,12 @@ export default function UserCabinet() {
                   className="flex items-center gap-1.5 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
-                  Tahrirlash
+                  {t("cabinet.edit")}
                 </button>
               
                 {app.status === 'approved' && (
                   <button onClick={() => setMissingCertModal(true)} className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
-                    Sertifikatni yuklab olish
+                    {t("cabinet.downloadCert")}
                   </button>
                 )}
               </div>
@@ -210,80 +210,80 @@ export default function UserCabinet() {
         </div>
       )}
 
-      <Modal open={!!editingApp} onClose={() => setEditingApp(null)} title="Arizani tahrirlash">
+      <Modal open={!!editingApp} onClose={() => setEditingApp(null)} title={t("cabinet.editTitle")}>
         {editingApp && (
           <div className="space-y-4 pt-4">
             {editingApp.status === 'approved' && (
               <div className="text-sm text-amber-700 mb-4 bg-amber-50 p-3 rounded-lg border border-amber-200">
-                <strong>Ogohlantirish:</strong> Bu ariza tasdiqlangan va sertifikat berilgan. Agar siz uni tahrirlasangiz, u qaytadan "Kutilmoqda" holatiga o'tadi va mavjud sertifikat bekor qilinadi.
+                <strong>{t("cabinet.warning")}:</strong> {t("cabinet.warningApproved")}
               </div>
             )}
             <div className="text-sm text-slate-500 mb-4 bg-blue-50 p-3 rounded-lg border border-blue-100">
-              Faqat o'zgartirish kerak bo'lgan maydonlarni to'ldiring. Fayllarni yangilash uchun yangi fayl yuklang.
+              {t("cabinet.editNote")}
             </div>
             
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input 
-                label="F.I.SH (Ism familiya)" 
+                label={t("apply.fullName")} 
                 defaultValue={editingApp.full_name || editingApp.fullName}
                 onChange={(e) => setEditData({...editData, full_name: e.target.value})} 
               />
               <Input 
-                label="Tug'ilgan sana" 
+                label={t("apply.dob")} 
                 type="date"
                 defaultValue={editingApp.date_of_birth || editingApp.dateOfBirth}
                 onChange={(e) => setEditData({...editData, date_of_birth: e.target.value})} 
               />
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700">Jinsi</label>
+                <label className="text-sm font-medium text-slate-700">{t("apply.gender")}</label>
                 <select 
                   defaultValue={editingApp.gender}
                   onChange={(e) => setEditData({...editData, gender: e.target.value})}
                   className="w-full rounded-[10px] border bg-white px-3.5 py-2.5 text-sm border-slate-200 outline-none focus:border-[#1a56db]"
                 >
-                  <option value="male">Erkak</option>
-                  <option value="female">Ayol</option>
+                  <option value="male">{t("apply.male")}</option>
+                  <option value="female">{t("apply.female")}</option>
                 </select>
               </div>
               <Input 
-                label="Telefon raqami" 
+                label={t("apply.phone")} 
                 defaultValue={editingApp.phone}
                 onChange={(e) => setEditData({...editData, phone: e.target.value})} 
               />
               <Input 
-                label="Email" 
+                label={t("apply.email")} 
                 type="email"
                 defaultValue={editingApp.email}
                 onChange={(e) => setEditData({...editData, email: e.target.value})} 
               />
               <Input 
-                label="Tashkilot" 
+                label={t("apply.organization")} 
                 defaultValue={editingApp.organization}
                 onChange={(e) => setEditData({...editData, organization: e.target.value})} 
               />
               <Input 
-                label="Lavozim" 
+                label={t("apply.position")} 
                 defaultValue={editingApp.position}
                 onChange={(e) => setEditData({...editData, position: e.target.value})} 
               />
               <Input 
-                label="Davlat" 
+                label={t("apply.country")} 
                 defaultValue={editingApp.country}
                 onChange={(e) => setEditData({...editData, country: e.target.value})} 
               />
               <Input 
-                label="Viloyat" 
+                label={t("apply.region")} 
                 defaultValue={editingApp.region || editingApp.regionName}
                 onChange={(e) => setEditData({...editData, region: e.target.value})} 
               />
               <Input 
-                label="Tuman/Shahar" 
+                label={t("apply.district")} 
                 defaultValue={editingApp.district || editingApp.districtName}
                 onChange={(e) => setEditData({...editData, district: e.target.value})} 
               />
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700">Ishtirok etish shakli</label>
+                <label className="text-sm font-medium text-slate-700">{t("cabinet.attendanceType")}</label>
                 <select 
                   defaultValue={editingApp.attendance_type || editingApp.attendanceType}
                   onChange={(e) => setEditData({...editData, attendance_type: e.target.value})}
@@ -295,14 +295,14 @@ export default function UserCabinet() {
               </div>
               <div className="md:col-span-2">
                 <Input 
-                  label="Maqola mavzusi" 
+                  label={t("apply.presentationTitle")} 
                   defaultValue={editingApp.presentation_title || editingApp.presentationTitle}
                   onChange={(e) => setEditData({...editData, presentation_title: e.target.value})} 
                 />
               </div>
               <div className="md:col-span-2">
                 <Textarea 
-                  label="Annotatsiya (Abstract)" 
+                  label={t("apply.abstract")} 
                   defaultValue={editingApp.abstract}
                   onChange={(e) => setEditData({...editData, abstract: e.target.value})} 
                   rows={4}
@@ -310,7 +310,7 @@ export default function UserCabinet() {
               </div>
             </div>
 <div className="space-y-3 pt-2">
-              <label className="block text-sm font-medium text-slate-700">Maqola fayli (Doc/Docx)</label>
+              <label className="block text-sm font-medium text-slate-700">{t("cabinet.docLabel")}</label>
               <input 
                 type="file" 
                 accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -324,7 +324,7 @@ export default function UserCabinet() {
             </div>
 
             <div className="space-y-3 pt-2">
-              <label className="block text-sm font-medium text-slate-700">Pasport nusxasi (PDF/Rasm)</label>
+              <label className="block text-sm font-medium text-slate-700">{t("cabinet.passportLabel")}</label>
               <input 
                 type="file" 
                 accept=".pdf,image/*"
@@ -342,23 +342,23 @@ export default function UserCabinet() {
                 onClick={() => setEditingApp(null)}
                 className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-xl"
               >
-                Bekor qilish
+                {t("cabinet.cancel")}
               </button>
               <button 
                 onClick={handleEditSubmit}
                 className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700"
               >
-                Saqlash va Yuborish
+                {t("cabinet.saveAndSubmit")}
               </button>
             </div>
           </div>
         )}
       </Modal>
 
-      <Modal open={missingCertModal} onClose={() => setMissingCertModal(false)} title="Ogohlantirish">
+      <Modal open={missingCertModal} onClose={() => setMissingCertModal(false)} title={t("cabinet.warning")}>
         <div className="py-6 text-center">
           <p className="text-slate-700 font-medium text-lg">
-            Hali sertifikatlar kiritilmadi, iltimos kuting.
+            {t("cabinet.noCertMsg")}
           </p>
           <button 
             onClick={() => setMissingCertModal(false)}
