@@ -20,8 +20,7 @@ export default function TrackApplicationPage() {
   const { applications } = useData();
 
   const [query, setQuery] = useState(searchParams.get('id') || '');
-  const [phone, setPhone] = useState(searchParams.get('phone') || '');
-  const [result, setResult] = useState<Application | null | 'not_found'>(null);
+    const [result, setResult] = useState<Application | null | 'not_found'>(null);
   const [loading, setLoading] = useState(false);
 
   const STATUS_STEPS: { status: ApplicationStatus; labelKey: string; icon: typeof CheckCircle }[] = [
@@ -31,12 +30,11 @@ export default function TrackApplicationPage() {
   ];
 
   const handleSearch = async (id: string) => {
-    if (!id.trim() || !phone.trim()) return;
+    if (!id.trim()) return;
     setLoading(true);
     setSearchParams({ id });
     try {
-      // Import apiClient at top if not there
-      const res = await window.__apiClient.get(`/applications/track/${id.trim()}/?phone=${encodeURIComponent(phone.trim())}`);
+      const res = await window.__apiClient.get(`/applications/track/${id.trim()}/`);
       setResult(getTranslatedContent(res.data, language));
     } catch (err: any) {
       if (err.response?.status === 404 || err.response?.status === 400) {
@@ -82,7 +80,7 @@ export default function TrackApplicationPage() {
               placeholder="Telefon raqam"
               className="flex-1 bg-white rounded-xl border-0 px-5 py-3.5 text-slate-800 font-mono text-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <Button size="lg" loading={loading} onClick={() => handleSearch(query)} disabled={!query.trim() || !phone.trim() || loading} icon={<Search className="w-5 h-5" />} className="shrink-0">
+            <Button size="lg" loading={loading} onClick={() => handleSearch(query)} disabled={!query.trim() || loading} icon={<Search className="w-5 h-5" />} className="shrink-0">
               {t('track.button')}
             </Button>
           </div>

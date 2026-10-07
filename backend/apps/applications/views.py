@@ -73,20 +73,9 @@ class TrackApplicationView(APIView):
         return self._handle_tracking(request, app_id)
 
     def _handle_tracking(self, request, application_id):
-        phone = request.query_params.get('phone')
-        if not phone and hasattr(request, 'data') and isinstance(request.data, dict):
-            phone = request.data.get('phone')
-
-        if not phone or not str(phone).strip():
+        if not application_id or not str(application_id).strip():
             return Response(
-                {'detail': "Ariza holatini ko'rish uchun telefon raqami kiritilishi shart."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        clean_req_phone = ''.join(c for c in str(phone) if c.isdigit())
-        if len(clean_req_phone) < 7:
-            return Response(
-                {'detail': "Telefon raqami noto'g'ri formatda."},
+                {'detail': "Ariza ID raqami kiritilishi shart."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -96,24 +85,10 @@ class TrackApplicationView(APIView):
             )
         except (Application.DoesNotExist, AttributeError, ValueError):
             return Response(
-                {'detail': "Ariza topilmadi yoki telefon raqami mos kelmadi."},
+                {'detail': "Ariza topilmadi."},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        clean_app_phone = ''.join(c for c in str(application.phone or '') if c.isdigit()) if application.phone else ''
-        if len(clean_app_phone) < 7:
-            return Response(
-                {'detail': "Ariza topilmadi yoki telefon raqami mos kelmadi."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        if not (clean_req_phone == clean_app_phone or clean_app_phone.endswith(clean_req_phone) or clean_req_phone.endswith(clean_app_phone)):
-            return Response(
-                {'detail': "Ariza topilmadi yoki telefon raqami mos kelmadi."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        # Return only restricted, safe fields to protect applicant PII and avoid leaking admin comments/passports
         invitation_url = request.build_absolute_uri(application.invitation_pdf.url) if application.invitation_pdf else None
         certificate_url = request.build_absolute_uri(application.certificate_pdf.url) if application.certificate_pdf else None
 
