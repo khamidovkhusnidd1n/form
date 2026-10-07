@@ -36,6 +36,7 @@ export const router = createBrowserRouter([
       { path: 'login', element: <ParticipantLoginPage /> },
       { path: 'register', element: <ParticipantRegisterPage /> },
       { path: 'certificate-check', element: <CertificateCheckPage /> },
+      { path: 'certificate/verify/:token', element: <CertificateCheckPage /> },
       { path: 'cabinet', element: <UserCabinet /> },
       { path: 'faq', element: <FAQPage /> },
     ],
