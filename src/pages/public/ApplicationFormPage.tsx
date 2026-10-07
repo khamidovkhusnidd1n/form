@@ -32,6 +32,7 @@ export default function ApplicationFormPage() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [successPhone, setSuccessPhone] = useState<string>('');
   const [selectedRegionId, setSelectedRegionId] = useState<string>('');
   const [files, setFiles] = useState<{ document?: File; passport?: File; photo?: File }>({});
   const [attendanceType, setAttendanceType] = useState<'online' | 'offline'>('offline');
@@ -184,6 +185,7 @@ export default function ApplicationFormPage() {
     try {
       const realId = await addApplication(newApp);
       setSuccessId((realId as unknown as string) || id);
+      setSuccessPhone(data.phone || '');
       toast.success(t('common.success'));
     } catch (e: any) {
       const data = e?.response?.data;
@@ -241,7 +243,7 @@ export default function ApplicationFormPage() {
             <p className="text-xs text-slate-400 mt-1">{t('apply.idNotice')}</p>
           </div>
           <div className="flex flex-col gap-3">
-            <a href={`/track?id=${successId}&phone=${encodeURIComponent(getValues('phone') || '')}`}>
+            <a href={`/track?id=${successId}&phone=${encodeURIComponent(successPhone || '')}`}>
               <Button className="w-full justify-center">{t('apply.trackBtn')}</Button>
             </a>
             <Button variant="ghost" onClick={() => { setSuccessId(null); setStep(1); }} className="w-full justify-center">
