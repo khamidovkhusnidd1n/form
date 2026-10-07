@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -13,7 +13,7 @@ from openpyxl.styles import Font, PatternFill, Alignment
 from .models import Application
 from .serializers import (
     ApplicationSubmitSerializer, ApplicationStatusSerializer,
-    ApplicationAdminSerializer, StatusUpdateSerializer
+    ApplicationAdminSerializer, StatusUpdateSerializer, ApplicationUserEditSerializer
 )
 from apps.accounts.permissions import IsAdminOrAbove, IsModeratorOrAbove
 from apps.notifications.services import NotificationService
@@ -295,9 +295,34 @@ class MyApplicationListView(generics.ListAPIView):
     def get_queryset(self):
         from django.db.models import Q
         user = self.request.user
-        return Application.objects.filter(
+        return Application.objects.select_related('event').filter(
             Q(user=user) | Q(email__iexact=user.email)
         ).order_by('-submitted_at')
+
+
+class MyApplicationUpdateView(generics.UpdateAPIView):
+    """Applicant edits their own application (any status). Admin sees it as 'edited'."""
+    serializer_class = ApplicationUserEditSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    http_method_names = ['patch', 'put', 'options']
+
+    def get_queryset(self):
+        from django.db.models import Q
+        user = self.request.user
+        return Application.objects.select_related('event').filter(
+            Q(user=user) | Q(email__iexact=user.email)
+        )
+
+    def update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        instance.refresh_from_db()
+        return Response(ApplicationStatusSerializer(instance, context=self.get_serializer_context()).data)
+
 
 class UserReplyView(APIView):
     permission_classes = [permissions.IsAuthenticated]

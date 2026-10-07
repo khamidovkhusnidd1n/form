@@ -7,6 +7,7 @@ urlpatterns = [
     path('api/v1/accounts/', include('apps.accounts.urls')),
     path('api/v1/events/', include('apps.events.urls')),
     path('api/v1/applications/', include('apps.applications.urls')),
+    path('api/v1/certificates/', include('apps.certificates.urls')),
     path('api/v1/faqs/', include('apps.faqs.urls')),
     path('api/v1/dashboard/', include('apps.dashboard.urls')),
     path('api/v1/qr/', include('apps.qr.urls')),

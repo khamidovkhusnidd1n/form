@@ -5,6 +5,7 @@ from . import debug_views
 urlpatterns = [
     path('submit/', views.SubmitApplicationView.as_view(), name='submit_application'),
     path('me/', views.MyApplicationListView.as_view(), name='my_applications'),
+    path('me/<int:pk>/', views.MyApplicationUpdateView.as_view(), name='my_application_update'),
     path('debug-me/', debug_views.DebugMeView.as_view(), name='debug_me'),
     path('me/<int:pk>/reply/', views.UserReplyView.as_view(), name='user_reply'),
     path('track/<str:application_id>/', views.TrackApplicationView.as_view(), name='track_application'),

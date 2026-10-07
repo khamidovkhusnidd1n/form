@@ -3,14 +3,19 @@ import { Navigate } from 'react-router-dom';
 import { apiClient as api } from '../../api/client';
 import toast from 'react-hot-toast';
 import { useTranslation } from '../../i18n';
-import { MessageCircle, CheckCircle, Clock, XCircle, FileText, Send, User } from 'lucide-react';
+import { MessageCircle, CheckCircle, Clock, XCircle, FileText, Send, User, Edit2, UploadCloud } from 'lucide-react';
 import { useAuth } from '../../store/authStore';
+import Modal from '../../components/ui/Modal';
+import Input from '../../components/ui/Input';
+import Textarea from '../../components/ui/Textarea';
 
 export default function UserCabinet() {
   const { t, language } = useTranslation();
   const [apps, setApps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [replyText, setReplyText] = useState<{ [key: number]: string }>({});
+  const [editingApp, setEditingApp] = useState<any | null>(null);
+  const [editData, setEditData] = useState<any>({});
   const { isAuthenticated, token } = useAuth();
   
   const fetchApps = () => {
@@ -56,6 +61,30 @@ export default function UserCabinet() {
     }
   };
 
+  const handleEditSubmit = async () => {
+    if (!editingApp) return;
+    const formData = new FormData();
+    Object.keys(editData).forEach(key => {
+      if (editData[key] !== undefined && editData[key] !== null) {
+        formData.append(key, editData[key]);
+      }
+    });
+    
+    try {
+      await api.patch(`/applications/me/${editingApp.id}/`, formData, {
+        headers: { 
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      toast.success("Ariza muvaffaqiyatli tahrirlandi!");
+      setEditingApp(null);
+      fetchApps();
+    } catch (e) {
+      toast.error("Tahrirlashda xatolik yuz berdi");
+    }
+  };
+
   // Auth Guard
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -95,6 +124,21 @@ export default function UserCabinet() {
                     {app.status === 'approved' ? 'Tasdiqlangan' : app.status === 'rejected' ? 'Bekor qilingan' : 'Kutilmoqda'}
                   </span>
                 </div>
+              </div>
+              
+              <div className="flex gap-2">
+                {(app.status === 'rejected' || app.status === 'info_required') && (
+                  <button 
+                    onClick={() => {
+                      setEditingApp(app);
+                      setEditData({});
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    Tahrirlash
+                  </button>
+                )}
               </div>
               
               {app.status === 'approved' && app.certificate_pdf && (
@@ -167,6 +211,81 @@ export default function UserCabinet() {
           ))}
         </div>
       )}
+
+      <Modal isOpen={!!editingApp} onClose={() => setEditingApp(null)} title="Arizani tahrirlash">
+        {editingApp && (
+          <div className="space-y-4 pt-4">
+            <div className="text-sm text-slate-500 mb-4 bg-blue-50 p-3 rounded-lg border border-blue-100">
+              Faqat o'zgartirish kerak bo'lgan maydonlarni to'ldiring. Fayllarni yangilash uchun yangi fayl yuklang.
+            </div>
+            
+            <Input 
+              label="Tashkilot" 
+              defaultValue={editingApp.organization}
+              onChange={(e) => setEditData({...editData, organization: e.target.value})} 
+            />
+            <Input 
+              label="Lavozim" 
+              defaultValue={editingApp.position}
+              onChange={(e) => setEditData({...editData, position: e.target.value})} 
+            />
+            <Input 
+              label="Maqola mavzusi" 
+              defaultValue={editingApp.presentation_title}
+              onChange={(e) => setEditData({...editData, presentation_title: e.target.value})} 
+            />
+            <Textarea 
+              label="Annotatsiya (Abstract)" 
+              defaultValue={editingApp.abstract}
+              onChange={(e) => setEditData({...editData, abstract: e.target.value})} 
+              rows={4}
+            />
+            
+            <div className="space-y-3 pt-2">
+              <label className="block text-sm font-medium text-slate-700">Maqola fayli (Doc/Docx)</label>
+              <input 
+                type="file" 
+                accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setEditData({...editData, document: e.target.files[0]});
+                  }
+                }}
+                className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+              />
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <label className="block text-sm font-medium text-slate-700">Pasport nusxasi (PDF/Rasm)</label>
+              <input 
+                type="file" 
+                accept=".pdf,image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setEditData({...editData, passport: e.target.files[0]});
+                  }
+                }}
+                className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
+              <button 
+                onClick={() => setEditingApp(null)}
+                className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-xl"
+              >
+                Bekor qilish
+              </button>
+              <button 
+                onClick={handleEditSubmit}
+                className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700"
+              >
+                Saqlash va Yuborish
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

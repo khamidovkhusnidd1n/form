@@ -1,4 +1,5 @@
 import random
+import logging
 import uuid
 import qrcode
 import io
@@ -10,10 +11,21 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
 from PIL import Image
 
+logger = logging.getLogger(__name__)
+
+
 def generate_certificate(application):
-    # Double-check duplicate
-    if hasattr(application, 'certificate'):
-        return application.certificate
+    # Reuse existing certificate if it already has a file
+    try:
+        existing = Certificate.objects.filter(application=application).first()
+    except Exception:
+        logger.exception("Certificate jadvalini o'qib bo'lmadi (migratsiya qilinmaganmi?)")
+        existing = None
+    if existing and existing.pdf_file:
+        if not application.certificate_pdf:
+            application.certificate_pdf = existing.pdf_file
+            application.save(update_fields=['certificate_pdf'])
+        return existing
         
     # Generate unique token
     token = str(uuid.uuid4())
@@ -112,22 +124,26 @@ def generate_certificate(application):
     c.save()
     pdf_io.seek(0)
     
-    # Create Certificate object
-    cert = Certificate(
-        application=application,
-        certificate_number=f"CF-{application.id}-{random.randint(1000, 9999)}",
-        verification_token=token,
-        status=Certificate.Status.ISSUED
-    )
-    
-    # Save files
-    cert.qr_code.save(f"qr_{token}.png", ContentFile(qr_io.getvalue()), save=False)
-    cert.pdf_file.save(f"cert_{token}.pdf", ContentFile(pdf_io.getvalue()), save=False)
-    cert.save()
-    
-    # Also link to application's certificate_pdf field for backward compatibility
-    application.certificate_pdf = cert.pdf_file
+    pdf_bytes = pdf_io.getvalue()
+
+    # Create/update Certificate record (same number as printed on the PDF)
+    cert = None
+    try:
+        cert = existing or Certificate(application=application)
+        cert.certificate_number = cert.certificate_number or cert_num
+        cert.verification_token = token
+        cert.status = Certificate.Status.ISSUED
+        cert.qr_code.save(f"qr_{token}.png", ContentFile(qr_io.getvalue()), save=False)
+        cert.pdf_file.save(f"cert_{token}.pdf", ContentFile(pdf_bytes), save=False)
+        cert.save()
+        application.certificate_pdf = cert.pdf_file
+    except Exception:
+        # Certificate table problem: still give the applicant the PDF
+        logger.exception("Certificate yozuvini saqlab bo'lmadi, PDF to'g'ridan-to'g'ri ariza ga biriktiriladi")
+        application.certificate_pdf.save(f"cert_{token}.pdf", ContentFile(pdf_bytes), save=False)
+        cert = None
+
     application.save(update_fields=['certificate_pdf'])
-    
     return cert
+
 

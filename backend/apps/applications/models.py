@@ -1,4 +1,4 @@
-﻿import random
+import random
 import string
 from django.db import models
 from apps.events.models import Event
@@ -70,6 +70,12 @@ class Application(models.Model):
     admin_comment = models.TextField(blank=True)
     user_reply = models.TextField(blank=True, verbose_name="Foydalanuvchi javobi")
     attended = models.BooleanField(default=False)
+
+    # Edit tracking: first submitted version is kept in original_data
+    is_edited = models.BooleanField(default=False, verbose_name="Tahrirlangan")
+    edit_count = models.PositiveSmallIntegerField(default=0)
+    edited_at = models.DateTimeField(null=True, blank=True)
+    original_data = models.JSONField(null=True, blank=True, verbose_name="Birinchi yuborilgan versiya")
 
     submitted_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

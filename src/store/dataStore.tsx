@@ -111,6 +111,10 @@ export function transformApplication(item: any): Application {
     createdAt: createdAtVal,
     updatedAt: item.updated_at ?? item.updatedAt ?? '',
     translations: item.translations,
+    is_edited: item.is_edited,
+    edit_count: item.edit_count,
+    edited_at: item.edited_at,
+    user_reply: item.user_reply,
   };
 }
 

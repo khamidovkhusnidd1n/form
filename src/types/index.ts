@@ -79,6 +79,10 @@ export interface Application {
   workStudyPlace?: string;
   passportSeriesNumber?: string;
   createdAt?: string;
+  is_edited?: boolean;
+  edit_count?: number;
+  edited_at?: string;
+  user_reply?: string;
 }
 export interface AdminUser {
   id: number;

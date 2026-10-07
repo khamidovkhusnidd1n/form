@@ -88,14 +88,18 @@ class ApplicationSubmitSerializer(serializers.ModelSerializer):
 
 class ApplicationStatusSerializer(serializers.ModelSerializer):
     event_title = serializers.CharField(source='event.title', read_only=True)
+    event_format = serializers.CharField(source='event.format', read_only=True)
     certificate_pdf = serializers.SerializerMethodField()
 
     class Meta:
         model = Application
         fields = [
-            'id', 'application_id', 'full_name', 'email', 'organization', 'position',
-            'country', 'region', 'district', 'event_title', 'attendance_type', 'presentation_title', 'abstract',
-            'status', 'admin_comment', 'attended', 'translations', 'submitted_at', 'updated_at',
+            'id', 'application_id', 'event', 'full_name', 'email', 'date_of_birth', 'gender', 'phone',
+            'organization', 'position',
+            'country', 'region', 'district', 'event_title', 'event_format', 'attendance_type',
+            'presentation_title', 'abstract', 'document', 'passport', 'photo',
+            'status', 'admin_comment', 'user_reply', 'attended', 'translations', 'submitted_at', 'updated_at',
+            'is_edited', 'edit_count', 'edited_at',
             'invitation_pdf', 'certificate_pdf',
         ]
         read_only_fields = fields
@@ -104,20 +108,106 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
         """Return certificate URL; self-heal if approved but certificate missing."""
         if obj.status != 'approved':
             return None
-        pdf = obj.certificate_pdf
-        if not pdf:
+        if not obj.certificate_pdf:
             try:
                 from apps.certificates.services import generate_certificate
-                cert = generate_certificate(obj)
-                pdf = cert.pdf_file or obj.certificate_pdf
+                generate_certificate(obj)
+                obj.refresh_from_db(fields=['certificate_pdf'])
             except Exception:
                 import logging
                 logging.getLogger(__name__).exception("Sertifikatni yaratib bo'lmadi")
                 return None
+        pdf = obj.certificate_pdf
         if not pdf:
             return None
         request = self.context.get('request')
         return request.build_absolute_uri(pdf.url) if request else pdf.url
+
+
+USER_EDITABLE_FIELDS = [
+    'attendance_type', 'full_name', 'date_of_birth', 'gender', 'phone',
+    'organization', 'position', 'country', 'region', 'district',
+    'presentation_title', 'abstract',
+]
+USER_EDITABLE_FILES = ['document', 'passport', 'photo']
+
+
+class ApplicationUserEditSerializer(serializers.ModelSerializer):
+    """Applicant edits their own application. First version is snapshotted for admins."""
+
+    class Meta:
+        model = Application
+        fields = USER_EDITABLE_FIELDS + USER_EDITABLE_FILES
+        extra_kwargs = {name: {'required': False} for name in USER_EDITABLE_FIELDS + USER_EDITABLE_FILES}
+
+    def validate_document(self, value):
+        return validate_uploaded_file(value)
+
+    def validate_passport(self, value):
+        return validate_uploaded_file(value)
+
+    def validate_photo(self, value):
+        return validate_uploaded_file(value)
+
+    def validate(self, data):
+        event = self.instance.event
+        attendance_type = data.get('attendance_type')
+        if attendance_type:
+            if event.format == 'online' and attendance_type == 'offline':
+                raise serializers.ValidationError(
+                    {"attendance_type": "Bu tadbir faqat Online formatda o'tkaziladi."})
+            if event.format == 'offline' and attendance_type == 'online':
+                raise serializers.ValidationError(
+                    {"attendance_type": "Bu tadbir faqat Offline formatda o'tkaziladi."})
+        return data
+
+    @staticmethod
+    def _snapshot(instance):
+        from django.conf import settings
+        snap = {}
+        for name in USER_EDITABLE_FIELDS:
+            value = getattr(instance, name)
+            snap[name] = value.isoformat() if hasattr(value, 'isoformat') else value
+        for name in USER_EDITABLE_FILES:
+            f = getattr(instance, name)
+            snap[name] = (settings.MEDIA_URL + f.name) if f else None
+        snap['status'] = instance.status
+        snap['submitted_at'] = instance.submitted_at.isoformat() if instance.submitted_at else None
+        return snap
+
+    def update(self, instance, validated_data):
+        from django.utils import timezone
+
+        if not instance.original_data:
+            instance.original_data = self._snapshot(instance)
+
+        had_certificate = bool(instance.certificate_pdf)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.is_edited = True
+        instance.edit_count = (instance.edit_count or 0) + 1
+        instance.edited_at = timezone.now()
+        # Edited application goes back to the review queue
+        instance.status = Application.Status.SUBMITTED
+        if had_certificate:
+            instance.certificate_pdf = None
+        instance.save()
+
+        if had_certificate:
+            try:
+                from apps.certificates.models import Certificate
+                Certificate.objects.filter(application=instance).delete()
+            except Exception:
+                import logging
+                logging.getLogger(__name__).exception("Eski sertifikatni o'chirib bo'lmadi")
+
+        ApplicationService.log_action(
+            instance.email, 'user_edit', [instance.id],
+            {'application_id': instance.application_id, 'edit_count': instance.edit_count},
+        )
+        return instance
+
 
 
 class ApplicationAdminSerializer(serializers.ModelSerializer):

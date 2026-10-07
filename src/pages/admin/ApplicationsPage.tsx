@@ -294,12 +294,17 @@ export default function ApplicationsPage() {
                   <td className="px-4 py-3.5 text-slate-600 max-w-[160px] truncate">{app.organization}</td>
                   <td className="px-4 py-3.5 text-slate-600 max-w-[160px] truncate">{app.eventTitle}</td>
                   <td className="px-4 py-3.5 text-slate-400 text-xs">{formatDate(app.submittedAt, language)}</td>
-                  <td className="px-4 py-3.5"><StatusBadge status={app.status} /></td>
-                  <td className="px-4 py-3.5">
-                    <div className="flex gap-1">
-                      <button onClick={() => setSelected(app)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 transition-colors" title={t('common.view')}>
-                        <Eye className="w-4 h-4" />
-                      </button>
+                    <td className="px-4 py-3.5"><StatusBadge status={app.status} /></td>
+                    <td className="px-4 py-3.5">
+                      <div className="flex gap-1">
+                        {app.is_edited && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-700 border border-purple-200 cursor-help" title={`Foydalanuvchi tahrirlagan (${app.edit_count} marta)`}>
+                            Tahrirlangan
+                          </span>
+                        )}
+                        <button onClick={() => setSelected(app)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 transition-colors" title={t('common.view')}>
+                          <Eye className="w-4 h-4" />
+                        </button>
                       <button
                         onClick={() => { 
                           setStatusModal(app); 
