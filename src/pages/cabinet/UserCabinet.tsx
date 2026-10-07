@@ -126,26 +126,24 @@ export default function UserCabinet() {
                 </div>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-3 mt-4">
                 <button 
                   onClick={() => {
                     setEditingApp(app);
                     setEditData({});
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
                   Tahrirlash
                 </button>
-              </div>
               
-              {app.status === 'approved' && app.certificate_pdf && (
-                <div className="mb-4">
-                  <a href={app.certificate_pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors">
+                {app.status === 'approved' && app.certificate_pdf && (
+                  <a href={app.certificate_pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
                     Sertifikatni yuklab olish
                   </a>
-                </div>
-              )}
+                )}
+              </div>
 
               {(app.admin_comment || (app.translations && app.translations[language]?.adminComment)) && (
                 <div className="mt-6 bg-slate-50/80 rounded-2xl border border-slate-200 p-5 overflow-hidden">
@@ -222,6 +220,16 @@ export default function UserCabinet() {
               Faqat o'zgartirish kerak bo'lgan maydonlarni to'ldiring. Fayllarni yangilash uchun yangi fayl yuklang.
             </div>
             
+            <Input 
+              label="F.I.SH (Ism familiya)" 
+              defaultValue={editingApp.fullName}
+              onChange={(e) => setEditData({...editData, full_name: e.target.value})} 
+            />
+            <Input 
+              label="Telefon raqami" 
+              defaultValue={editingApp.phone}
+              onChange={(e) => setEditData({...editData, phone: e.target.value})} 
+            />
             <Input 
               label="Tashkilot" 
               defaultValue={editingApp.organization}
