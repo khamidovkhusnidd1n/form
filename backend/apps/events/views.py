@@ -2,29 +2,73 @@ from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from django.core.files import File
+from django.db import DatabaseError
+from django.shortcuts import get_object_or_404
+from pathlib import Path
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as filters
 from .models import Event
 from .serializers import (
     EventListSerializer, EventDetailSerializer,
-    EventCreateUpdateSerializer, EventGallerySerializer
+    EventCreateUpdateSerializer, EventGallerySerializer, EventPartnerSerializer
 )
 from apps.accounts.permissions import IsAdminOrAbove, IsModeratorOrAbove
+
+
+DEFAULT_CERTIFICATE_PARTNERS = (
+    ('Badiiy ta’lim markazi', 'markaz.png'),
+    ('O‘zbekiston Badiiy akademiyasi', 'badiiy-akademiya.png'),
+    ('Sharq san’ati va estetik ta’lim tadqiqot markazi', 'sharq-sanati.png'),
+    ('Hubei Institute of Fine Arts', 'hubei.png'),
+    ('Universiti Teknologi MARA', 'mara-emblem.png'),
+)
+
+
+@api_view(['POST'])
+@permission_classes([IsModeratorOrAbove])
+def add_default_certificate_partners(request, pk):
+    """Attach the supplied partner logos to one event without replacing its existing partners."""
+    event = get_object_or_404(Event, pk=pk)
+    logos_dir = Path(__file__).resolve().parent / 'default_partner_logos'
+    created = []
+    try:
+        for order, (name, filename) in enumerate(DEFAULT_CERTIFICATE_PARTNERS):
+            if event.partners.filter(name=name).exists():
+                continue
+            logo_path = logos_dir / filename
+            if not logo_path.is_file():
+                return Response({'detail': f'Logo fayli topilmadi: {filename}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            from .models import EventPartner
+            with logo_path.open('rb') as stream:
+                partner = EventPartner(event=event, name=name, order=order)
+                partner.logo.save(filename, File(stream), save=False)
+                partner.save()
+            created.append(partner)
+    except DatabaseError:
+        return Response(
+            {'detail': 'Hamkor logolari jadvali hali tayyor emas. Hosting terminalida python manage.py migrate events buyrug‘ini bajaring.'},
+            status=status.HTTP_409_CONFLICT,
+        )
+    return Response({
+        'created': len(created),
+        'partners': EventPartnerSerializer(event.partners.all(), many=True, context={'request': request}).data,
+    })
 
 
 @api_view(['GET'])
 @permission_classes([IsModeratorOrAbove])
 def certificate_preview(request, pk):
-    from django.shortcuts import get_object_or_404
     from django.http import HttpResponse
     from django.utils import timezone
     from apps.certificates.layout import render_certificate
+    from apps.certificates.services import get_event_partners
     event = get_object_or_404(Event, pk=pk)
     pdf = render_certificate(
         full_name='Ishtirokchi Ism Familiyasi', event_title=event.title,
         date=timezone.localdate().strftime('%d.%m.%Y'), number='NAMUNA',
         verify_url=f'{request.scheme}://{request.get_host()}/certificate-check',
-        partners=[{'name': p.name, 'logo': p.logo} for p in event.partners.all()],
+        partners=get_event_partners(event),
     )
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="sertifikat-namuna.pdf"'

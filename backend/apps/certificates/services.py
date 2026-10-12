@@ -1,9 +1,23 @@
 import uuid
 import qrcode
 import io
+import logging
+from django.db import DatabaseError
 from django.core.files.base import ContentFile
 from django.conf import settings
 from .models import Certificate
+
+
+logger = logging.getLogger(__name__)
+
+
+def get_event_partners(event):
+    """Return event logos without preventing certificate issuance during a pending migration."""
+    try:
+        return [{'name': partner.name, 'logo': partner.logo} for partner in event.partners.all()]
+    except DatabaseError:
+        logger.warning('Hamkorlar jadvali hali tayyor emas; sertifikat logolarsiz yaratildi')
+        return []
 
 def generate_certificate(application):
     # Reuse existing certificate if it already has a file
@@ -36,7 +50,7 @@ def generate_certificate(application):
         full_name=application.full_name, event_title=application.event.title,
         date=timezone.localdate().strftime("%d.%m.%Y"), number=cert_num,
         verify_url=verify_url,
-        partners=[{'name': p.name, 'logo': p.logo} for p in application.event.partners.all()],
+        partners=get_event_partners(application.event),
     )
 
     # Create/update Certificate record (same number as printed on the PDF)

@@ -43,6 +43,7 @@ export default function EventsAdminPage() {
   const [isNew, setIsNew] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [autoTranslating, setAutoTranslating] = useState(false);
+  const [addingDefaultPartners, setAddingDefaultPartners] = useState(false);
 
   const openCreate = () => {
     setEditing(EMPTY_EVENT);
@@ -409,6 +410,16 @@ export default function EventsAdminPage() {
 
             <div className="sm:col-span-2 rounded-xl border border-slate-200 p-4 space-y-3">
               <h3 className="font-semibold text-slate-800">Sertifikat hamkorlari</h3>
+              {!isNew && <Button variant="secondary" size="sm" loading={addingDefaultPartners} onClick={async () => {
+                setAddingDefaultPartners(true);
+                try {
+                  const { data } = await apiClient.post(`/events/admin/${editing.id}/certificate-partners/defaults/`);
+                  setEditing(ed => ({ ...ed, partners: data.partners }));
+                  toast.success(data.created ? `${data.created} ta hamkor logosi qo‘shildi.` : 'Hamkor logolari avval qo‘shilgan.');
+                } catch (error: any) {
+                  toast.error(error.response?.data?.detail || 'Hamkor logolarini qo‘shib bo‘lmadi.');
+                } finally { setAddingDefaultPartners(false); }
+              }}>Siz bergan 5 ta logoni qo‘shish</Button>}
               {!isNew && <Button variant="ghost" onClick={async () => {
                 try {
                   const result = await apiClient.get(`/events/admin/${editing.id}/certificate-preview/`, { responseType: 'blob' });

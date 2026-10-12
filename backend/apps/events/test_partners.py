@@ -75,6 +75,17 @@ class EventPartnerTests(TestCase):
         force_authenticate(request, user=SimpleNamespace(is_authenticated=True, is_superuser=False, role='participant'))
         self.assertEqual(certificate_preview(request, pk=self.event.pk).status_code, 403)
 
+    def test_admin_can_add_packaged_partner_logos_once(self):
+        from .views import add_default_certificate_partners
+        request = APIRequestFactory().post('/defaults/')
+        force_authenticate(request, user=SimpleNamespace(is_authenticated=True, is_superuser=False, role='moderator'))
+        response = add_default_certificate_partners(request, pk=self.event.pk)
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data['created'], 5)
+        self.assertEqual(self.event.partners.count(), 5)
+        response = add_default_certificate_partners(request, pk=self.event.pk)
+        self.assertEqual(response.data['created'], 0)
+
     def test_pdf_handles_zero_one_and_twelve_partners_and_long_text(self):
         for count in [0, 1, 12]:
             pdf = render_certificate(full_name='Uzun ism ' * 30, event_title='Xalqaro tadbir ' * 35,

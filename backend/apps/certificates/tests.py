@@ -1,12 +1,14 @@
 import tempfile
 from unittest.mock import patch
+from types import SimpleNamespace
+from django.db import OperationalError
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APIRequestFactory
 from apps.events.models import Event
 from apps.applications.models import Application
 from .models import Certificate
-from .services import generate_certificate
+from .services import generate_certificate, get_event_partners
 from .views import VerifyCertificateView
 from .layout import render_certificate
 
@@ -55,3 +57,12 @@ class CertificateVerificationTests(TestCase):
                 generate_certificate(self.application)
         self.application.refresh_from_db()
         self.assertFalse(self.application.certificate_pdf)
+
+    def test_missing_partner_table_does_not_block_certificate_issuance(self):
+        unavailable_event = SimpleNamespace(partners=SimpleNamespace(
+            all=lambda: (_ for _ in ()).throw(OperationalError('missing table')),
+        ))
+        self.assertEqual(get_event_partners(unavailable_event), [])
+        with patch('apps.certificates.services.get_event_partners', return_value=[]):
+            certificate = generate_certificate(self.application)
+        self.assertTrue(certificate.pdf_file)
