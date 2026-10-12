@@ -12,14 +12,15 @@ export default function CertificateCheckPage() {
 
   const checkToken = async (verifyToken: string) => {
     setLoading(true);
+    setResult(null);
     try {
-      const res = await api.get('/certificates/verify/' + verifyToken + '/');
+      const res = await api.get('/certificates/verify/' + encodeURIComponent(verifyToken) + '/');
       setResult(res.data);
     } catch (err: any) {
-      if (err.response && err.response.status === 400) {
-         setResult({ valid: false, message: "Sertifikat bekor qilingan (Revoked)." });
+      if (err.response && [400, 404].includes(err.response.status)) {
+         setResult({ valid: false, message: err.response.data?.message || 'Sertifikat topilmadi.' });
       } else {
-         setResult({ valid: false, message: "Sertifikat topilmadi yoki xato token." });
+         setResult({ valid: false, message: 'Tekshirish xizmatiga ulanib bo‘lmadi. Qayta urinib ko‘ring.' });
       }
     } finally {
       setLoading(false);
@@ -28,14 +29,16 @@ export default function CertificateCheckPage() {
 
   useEffect(() => {
     if (urlToken) {
+      setToken(urlToken);
       checkToken(urlToken);
     }
   }, [urlToken]);
 
   const handleCheck = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (token) {
-      navigate('/certificate/verify/' + token);
+    if (token.trim()) {
+      if (urlToken === token.trim()) checkToken(token.trim());
+      else navigate('/certificate/verify/' + encodeURIComponent(token.trim()));
     }
   };
 
@@ -46,7 +49,7 @@ export default function CertificateCheckPage() {
         <input 
           className="border p-3 w-2/3 rounded-l-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
           type="text" 
-          placeholder="Sertifikat ID yoki Tokenni kiriting" 
+          placeholder="Sertifikat tokenini kiriting"
           value={token} 
           onChange={e => setToken(e.target.value)} 
           required 
@@ -55,6 +58,7 @@ export default function CertificateCheckPage() {
           {loading ? 'Kutmoqda...' : 'Tekshirish'}
         </button>
       </form>
+      {loading && <p role="status" className="text-slate-600 mb-6">Sertifikat haqiqiyligi tekshirilmoqda...</p>}
       
       {result && (
         <div className={result.valid ? "p-8 border rounded-2xl shadow-sm bg-emerald-50 border-emerald-100" : "p-8 border rounded-2xl shadow-sm bg-red-50 border-red-100"}>
@@ -64,6 +68,7 @@ export default function CertificateCheckPage() {
               <h3 className="text-2xl font-bold text-emerald-700 mb-4">Sertifikat Haqiqiy</h3>
               <div className="bg-white p-6 rounded-xl w-full text-left space-y-3 shadow-sm border border-emerald-100/50">
                 <p className="text-lg text-slate-700"><strong className="text-slate-900">Ism:</strong> {result.name}</p>
+                <p className="text-lg text-slate-700"><strong className="text-slate-900">Tadbir:</strong> {result.event}</p>
                 <p className="text-lg text-slate-700"><strong className="text-slate-900">Qayd raqami:</strong> {result.id}</p>
                 <p className="text-lg text-slate-700"><strong className="text-slate-900">Sana:</strong> {result.date}</p>
               </div>

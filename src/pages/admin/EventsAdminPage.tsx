@@ -212,10 +212,10 @@ export default function EventsAdminPage() {
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex gap-1">
-                      <button onClick={() => openEdit(rawEvent)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 transition-colors">
+                      <button aria-label={t('common.edit')} title={t('common.edit')} onClick={() => openEdit(rawEvent)} className="p-2.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors">
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button onClick={() => setDeleteId(event.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors">
+                      <button aria-label={t('common.delete')} title={t('common.delete')} onClick={() => setDeleteId(event.id)} className="p-2.5 rounded-lg hover:bg-red-50 text-red-600 transition-colors">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -394,7 +394,7 @@ export default function EventsAdminPage() {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('eventsAdmin.bannerLabel') || 'Rasm (Banner)'}</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">{{ uz: 'Tadbir banneri', ru: 'Баннер мероприятия', en: 'Event banner' }[language]}</label>
               <input
                 type="file"
                 accept="image/*"
@@ -438,6 +438,14 @@ export default function EventsAdminPage() {
                       setEditing(ed => ({ ...ed, partners: ed.partners?.map((p, i) => i === index ? { ...p, logoFile: file } : p) }));
                     }} />
                   {partner.logoFile && <p className="text-xs text-emerald-700">Tanlandi: {partner.logoFile.name}</p>}
+                  <button type="button" className="text-sm text-indigo-600" onClick={async () => {
+                    try {
+                      const response = await fetch('/partners/mara-emblem.png');
+                      if (!response.ok) throw new Error('Logo');
+                      const file = new File([await response.blob()], 'mara-emblem.png', { type: 'image/png' });
+                      setEditing(ed => ({ ...ed, partners: ed.partners?.map((p, i) => i === index ? { ...p, name: p.name || 'Universiti Teknologi MARA', logoFile: file } : p) }));
+                    } catch { toast.error('MARA logosini yuklab bo‘lmadi.'); }
+                  }}>MARA emblemasini tanlash (yozuvsiz)</button>
                   <div className="flex gap-3 text-sm">
                     <button type="button" disabled={index === 0} className="disabled:opacity-30" onClick={() => setEditing(ed => {
                       const partners = [...(ed.partners || [])]; [partners[index-1], partners[index]] = [partners[index], partners[index-1]]; return { ...ed, partners };

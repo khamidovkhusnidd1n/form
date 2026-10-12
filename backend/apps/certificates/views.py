@@ -10,9 +10,11 @@ class VerifyCertificateView(APIView):
 
     def get(self, request, token, *args, **kwargs):
         try:
-            cert = Certificate.objects.get(verification_token=token)
+            cert = Certificate.objects.select_related('application__event').get(verification_token=token)
             if cert.status == Certificate.Status.REVOKED or cert.revoked_at is not None:
                 return Response({'valid': False, 'message': 'Ushbu sertifikat bekor qilingan (Revoked)'}, status=status.HTTP_400_BAD_REQUEST)
+            if cert.status != Certificate.Status.ISSUED or not cert.pdf_file:
+                return Response({'valid': False, 'message': 'Sertifikat hali berilmagan.'}, status=status.HTTP_400_BAD_REQUEST)
                 
             return Response({
                 'valid': True,

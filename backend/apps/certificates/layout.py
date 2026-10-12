@@ -85,7 +85,7 @@ def render_certificate(*, full_name, event_title, date, number, verify_url, part
     c.setStrokeColor(gold)
     c.line(width-282, 92, width-64, 92)
     c.setFont('Times-Roman', 11)
-    c.drawCentredString(width-173, 74, 'Tashkilotchi / mas’ul shaxs')
+    c.drawCentredString(width-173, 74, 'D. Shukurov')
     c.showPage()
     c.save()
     return output.getvalue()

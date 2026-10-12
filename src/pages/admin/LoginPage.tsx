@@ -64,7 +64,7 @@ export default function LoginPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-[#0f2560] to-[#1a56db] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-6 shadow-xl shadow-[#1a56db]/20 relative z-10 p-2">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-6 shadow-xl shadow-[#1a56db]/20 relative z-10 p-2">
               <img src={logoImage} alt="Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-1">{t('login.title')}</h1>

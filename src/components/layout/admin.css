@@ -1,0 +1,60 @@
+/* Admin-only presentation: public pages and API behavior are unaffected. */
+.admin-panel { --admin-border: #e2e8f0; }
+.admin-panel :where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+.admin-panel .admin-content > div {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+  padding: 28px 32px;
+}
+.admin-panel .admin-content :where(.bg-white.rounded-2xl) {
+  border-color: var(--admin-border);
+  box-shadow: 0 3px 16px rgb(15 23 42 / 3%);
+}
+.admin-panel .admin-content :where(h1) { letter-spacing: -.035em; }
+.admin-panel .admin-content :where(table) { border-collapse: collapse; }
+.admin-panel .admin-content :where(thead) { background: #f8fafc; }
+.admin-panel .admin-content :where(th) { padding-block: 16px; color: #64748b; }
+.admin-panel .admin-content :where(td) { vertical-align: middle; }
+.admin-panel .admin-content .fixed.inset-0 > .relative > .flex:first-child {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+}
+.admin-panel .admin-content :where(input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea) {
+  min-height: 42px;
+}
+.admin-panel .admin-content :where(input[type=file]) {
+  max-width: 100%;
+  font-size: 12px;
+}
+.admin-panel .admin-content input[type=file]::file-selector-button {
+  margin-right: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #eff6ff;
+  padding: 8px 10px;
+  color: #1d4ed8;
+  cursor: pointer;
+}
+@media (max-width: 639px) {
+  .admin-panel .admin-content > div { padding: 20px 16px; }
+  .admin-panel .admin-content > div > .flex.items-center.justify-between {
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .admin-panel .admin-content > div > .flex.items-center.justify-between > .flex {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .admin-panel .admin-content :where(h1) { font-size: 22px; }
+  .admin-panel .admin-content .fixed.inset-0 > .relative > .p-6 { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-panel *, .admin-panel *::before, .admin-panel *::after { transition-duration: 0s !important; }
+}
