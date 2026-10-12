@@ -128,6 +128,9 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
         partners = validated_data.pop('partner_data', None)
         event = super().update(instance, validated_data)
         self._save_partners(event, partners)
+        if partners is not None:
+            from apps.certificates.services import regenerate_event_certificates
+            regenerate_event_certificates(event)
         return event
 
     class Meta:

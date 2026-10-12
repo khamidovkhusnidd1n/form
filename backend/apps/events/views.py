@@ -50,8 +50,11 @@ def add_default_certificate_partners(request, pk):
             {'detail': 'Hamkor logolari jadvali hali tayyor emas. Hosting terminalida python manage.py migrate events buyrug‘ini bajaring.'},
             status=status.HTTP_409_CONFLICT,
         )
+    from apps.certificates.services import regenerate_event_certificates
+    refreshed_certificates = regenerate_event_certificates(event)
     return Response({
         'created': len(created),
+        'refreshed_certificates': refreshed_certificates,
         'partners': EventPartnerSerializer(event.partners.all(), many=True, context={'request': request}).data,
     })
 

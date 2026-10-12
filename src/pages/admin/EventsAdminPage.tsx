@@ -415,7 +415,8 @@ export default function EventsAdminPage() {
                 try {
                   const { data } = await apiClient.post(`/events/admin/${editing.id}/certificate-partners/defaults/`);
                   setEditing(ed => ({ ...ed, partners: data.partners }));
-                  toast.success(data.created ? `${data.created} ta hamkor logosi qo‘shildi.` : 'Hamkor logolari avval qo‘shilgan.');
+                  const certificateNote = data.refreshed_certificates ? ` ${data.refreshed_certificates} ta sertifikat yangilandi.` : '';
+                  toast.success(data.created ? `${data.created} ta hamkor logosi qo‘shildi.${certificateNote}` : `Hamkor logolari yangilandi.${certificateNote}`);
                 } catch (error: any) {
                   toast.error(error.response?.data?.detail || 'Hamkor logolarini qo‘shib bo‘lmadi.');
                 } finally { setAddingDefaultPartners(false); }

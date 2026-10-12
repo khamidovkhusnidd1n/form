@@ -19,6 +19,23 @@ def get_event_partners(event):
         logger.warning('Hamkorlar jadvali hali tayyor emas; sertifikat logolarsiz yaratildi')
         return []
 
+
+def regenerate_event_certificates(event):
+    """Recreate issued PDFs after an event's certificate partners change."""
+    from apps.applications.models import Application
+
+    refreshed = 0
+    applications = event.applications.filter(status=Application.Status.APPROVED)
+    for application in applications:
+        Certificate.objects.filter(application=application).delete()
+        if application.certificate_pdf:
+            application.certificate_pdf = None
+            application.save(update_fields=['certificate_pdf'])
+        generate_certificate(application)
+        refreshed += 1
+    return refreshed
+
+
 def generate_certificate(application):
     # Reuse existing certificate if it already has a file
     existing = Certificate.objects.filter(application=application).first()
