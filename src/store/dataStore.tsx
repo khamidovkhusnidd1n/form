@@ -34,6 +34,7 @@ export function transformEvent(item: any): Event {
   }
 
   return {
+    partners: item.partners || [],
     id: Number(item.id),
     title: item.title || '',
     type: item.type || 'conference',
@@ -251,6 +252,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         if (e.translations) formData.append('translations', JSON.stringify(e.translations));
       if (e.participantLimit) formData.append('participant_limit', String(e.participantLimit));
       if (e.bannerFile) formData.append('banner', e.bannerFile);
+      if (e.partners !== undefined) {
+        formData.append('partner_data', JSON.stringify(e.partners.map(p => ({ id: p.id, name: p.name }))));
+        e.partners.forEach((p, i) => { if (p.logoFile) formData.append(`partner_logo_${i}`, p.logoFile); });
+      }
 
       await apiClient.post('/events/admin/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -291,6 +296,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         if (e.translations) formData.append('translations', JSON.stringify(e.translations));
       if (e.participantLimit) formData.append('participant_limit', String(e.participantLimit));
       if (e.bannerFile) formData.append('banner', e.bannerFile);
+      if (e.partners !== undefined) {
+        formData.append('partner_data', JSON.stringify(e.partners.map(p => ({ id: p.id, name: p.name }))));
+        e.partners.forEach((p, i) => { if (p.logoFile) formData.append(`partner_logo_${i}`, p.logoFile); });
+      }
 
       await apiClient.patch(`/events/admin/${e.id}/`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -408,37 +417,29 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const updateApplicationStatus = async (appId: number | string, status: string, adminComment?: string, customTranslations?: Record<string, any>) => {
     let translationsToSave = customTranslations;
 
-    setApplications((prev) =>
-      prev.map((item) =>
-        item.id === Number(appId) || item.applicationId === String(appId)
-          ? {
-              ...item,
-              status: status as any,
-              adminComment: adminComment ?? item.adminComment,
-              translations: translationsToSave ? { ...item.translations, ...translationsToSave } : item.translations,
-              updatedAt: new Date().toISOString(),
-            }
-          : item
-      )
-    );
-
     try {
-      await apiClient.patch(`/applications/${appId}/status/`, {
+      await apiClient.patch(`/applications/admin/${appId}/status/`, {
         status,
         admin_comment: adminComment,
         translations: translationsToSave,
       });
+
+      setApplications((prev) =>
+        prev.map((item) =>
+          item.id === Number(appId) || item.applicationId === String(appId)
+            ? {
+                ...item,
+                status: status as any,
+                adminComment: adminComment ?? item.adminComment,
+                translations: translationsToSave ? { ...item.translations, ...translationsToSave } : item.translations,
+                updatedAt: new Date().toISOString(),
+              }
+            : item
+        )
+      );
     } catch (err) {
-      try {
-        await apiClient.patch(`/applications/admin/${appId}/status/`, {
-          status,
-          admin_comment: adminComment,
-          translations: translationsToSave,
-        });
-      } catch (fallbackErr) {
-        console.warn('Failed to update status on both endpoints', fallbackErr);
-        throw fallbackErr;
-      }
+      console.error('Failed to update status on admin endpoint', err);
+      throw err;
     }
   };
 
@@ -476,24 +477,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const updateApplication = async (app: Application) => {
-    setApplications((prev) => prev.map((item) => (item.id === app.id ? app : item)));
-
     try {
-      await apiClient.patch(`/applications/${app.id}/status/`, {
+      await apiClient.patch(`/applications/admin/${app.id}/status/`, {
         status: app.status,
         admin_comment: app.adminComment,
         translations: app.translations,
       });
+      setApplications((prev) => prev.map((item) => (item.id === app.id ? app : item)));
     } catch (err) {
-      try {
-        await apiClient.patch(`/applications/admin/${app.id}/status/`, {
-          status: app.status,
-          admin_comment: app.adminComment,
-          translations: app.translations,
-        });
-      } catch (fallbackErr) {
-        console.warn('Failed to update application on backend API, using local state:', err, fallbackErr);
-      }
+      console.error('Failed to update application on backend API:', err);
+      throw err;
     }
   };
 

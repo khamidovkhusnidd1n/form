@@ -12,6 +12,25 @@ from .serializers import (
 from apps.accounts.permissions import IsAdminOrAbove, IsModeratorOrAbove
 
 
+@api_view(['GET'])
+@permission_classes([IsModeratorOrAbove])
+def certificate_preview(request, pk):
+    from django.shortcuts import get_object_or_404
+    from django.http import HttpResponse
+    from django.utils import timezone
+    from apps.certificates.layout import render_certificate
+    event = get_object_or_404(Event, pk=pk)
+    pdf = render_certificate(
+        full_name='Ishtirokchi Ism Familiyasi', event_title=event.title,
+        date=timezone.localdate().strftime('%d.%m.%Y'), number='NAMUNA',
+        verify_url=f'{request.scheme}://{request.get_host()}/certificate-check',
+        partners=[{'name': p.name, 'logo': p.logo} for p in event.partners.all()],
+    )
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="sertifikat-namuna.pdf"'
+    return response
+
+
 class EventFilter(filters.FilterSet):
     type = filters.CharFilter(field_name='type')
     status = filters.CharFilter(field_name='status')

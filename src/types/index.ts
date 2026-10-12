@@ -17,7 +17,15 @@ export interface District {
   name: string;
   regionId: number;
 }
+export interface EventPartner {
+  id?: number;
+  name: string;
+  logo_url?: string;
+  logoFile?: File;
+  order?: number;
+}
 export interface Event {
+  partners?: EventPartner[];
   id: number;
   title: string;
   type: EventType;

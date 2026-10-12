@@ -9,6 +9,7 @@ import type { Event, EventType, EventFormat, EventStatus } from '../../types';
 import toast from 'react-hot-toast';
 import { useTranslation, LANGUAGE_LABELS, type Language } from '../../i18n';
 import { useData } from '../../store/dataStore';
+import { apiClient } from '../../api/client';
 import { translateContentToAllLanguages, getTranslatedContent } from '../../lib/translationService';
 
 const EVENT_FORMAT_LABELS: Record<string, Record<string, string>> = {
@@ -29,6 +30,7 @@ const EMPTY_EVENT: Partial<Event> = {
   registrationDeadline: '',
   venue: '',
   registrationEnabled: true,
+  partners: [],
 };
 
 export default function EventsAdminPage() {
@@ -85,6 +87,10 @@ export default function EventsAdminPage() {
   };
 
   const handleSave = async () => {
+    if ((editing.partners || []).some(p => !p.name.trim() || (!p.id && !p.logoFile))) {
+      toast.error('Har bir hamkor nomini kiriting va logosini yuklang.');
+      return;
+    }
     if (!editing.title || !editing.startDate || !editing.endDate || !editing.registrationDeadline || !editing.shortDescription || !editing.fullDescription || !editing.venue) {
       toast.error('Iltimos, barcha majburiy maydonlarni (nomi, sanalar, manzil, ta\'rif) to\'ldiring');
       return;
@@ -399,6 +405,51 @@ export default function EventsAdminPage() {
                 }}
                 className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#1a56db]/30"
               />
+            </div>
+
+            <div className="sm:col-span-2 rounded-xl border border-slate-200 p-4 space-y-3">
+              <h3 className="font-semibold text-slate-800">Sertifikat hamkorlari</h3>
+              {!isNew && <Button variant="ghost" onClick={async () => {
+                try {
+                  const result = await apiClient.get(`/events/admin/${editing.id}/certificate-preview/`, { responseType: 'blob' });
+                  const url = URL.createObjectURL(result.data);
+                  const link = document.createElement('a'); link.href = url; link.download = 'sertifikat-namuna.pdf'; link.click();
+                  setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } catch { toast.error('Sertifikat namunasini yuklab bo‘lmadi.'); }
+              }}>Saqlangan sertifikat namunasini yuklash</Button>}
+              <p className="text-sm text-slate-500">Logolar faqat ushbu tadbir sertifikatida shu tartibda chiqadi. PNG, JPEG yoki WebP, 5 MB gacha. Ko‘pi bilan 12 ta hamkor.</p>
+              {(editing.partners || []).map((partner, index) => (
+                <div key={partner.id || `new-${index}`} className="border rounded-lg p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input aria-label={`Hamkor ${index + 1} nomi`} placeholder="Hamkor tashkilot nomi" maxLength={255} value={partner.name}
+                      className="border rounded-lg px-3 py-2 flex-1 min-w-0"
+                      onChange={e => setEditing(ed => ({ ...ed, partners: ed.partners?.map((p, i) => i === index ? { ...p, name: e.target.value } : p) }))} />
+                    <button type="button" aria-label="Hamkorni olib tashlash" onClick={() => setEditing(ed => ({ ...ed, partners: ed.partners?.filter((_, i) => i !== index) }))}><Trash2 className="w-4 h-4 text-red-500" /></button>
+                  </div>
+                  {partner.logo_url && <img src={partner.logo_url} alt={partner.name} className="h-14 max-w-40 object-contain" />}
+                  <input type="file" accept="image/png,image/jpeg,image/webp" aria-label={`Hamkor ${index + 1} logosi`}
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 5 * 1024 * 1024 || !['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+                        toast.error('PNG, JPEG yoki WebP logo yuklang, hajmi 5 MB gacha.');
+                        e.target.value = ''; return;
+                      }
+                      setEditing(ed => ({ ...ed, partners: ed.partners?.map((p, i) => i === index ? { ...p, logoFile: file } : p) }));
+                    }} />
+                  {partner.logoFile && <p className="text-xs text-emerald-700">Tanlandi: {partner.logoFile.name}</p>}
+                  <div className="flex gap-3 text-sm">
+                    <button type="button" disabled={index === 0} className="disabled:opacity-30" onClick={() => setEditing(ed => {
+                      const partners = [...(ed.partners || [])]; [partners[index-1], partners[index]] = [partners[index], partners[index-1]]; return { ...ed, partners };
+                    })}>↑ Yuqoriga</button>
+                    <button type="button" disabled={index === (editing.partners?.length || 0)-1} className="disabled:opacity-30" onClick={() => setEditing(ed => {
+                      const partners = [...(ed.partners || [])]; [partners[index+1], partners[index]] = [partners[index], partners[index+1]]; return { ...ed, partners };
+                    })}>↓ Pastga</button>
+                  </div>
+                </div>
+              ))}
+              <Button variant="ghost" disabled={(editing.partners?.length || 0) >= 12} onClick={() => setEditing(ed => ({ ...ed, partners: [...(ed.partners || []), { name: '' }] }))}>+ Hamkor qo‘shish</Button>
+              <p className="text-xs text-slate-500">O‘zgarishlar yangi beriladigan sertifikatlarga qo‘llanadi. Avval berilgan sertifikatlar saqlanadi.</p>
             </div>
 
             <div className="sm:col-span-2 flex items-center gap-3">

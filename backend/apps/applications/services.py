@@ -3,11 +3,12 @@ from apps.common.services import FileManagementService
 
 
 ALLOWED_TRANSITIONS = {
-    'submitted': {'under_review', 'info_required', 'approved', 'rejected'},
-    'under_review': {'info_required', 'approved', 'rejected'},
-    'info_required': {'under_review', 'approved', 'rejected'},
-    'rejected': {'under_review'},
-    'approved': {'rejected'},
+    'submitted': {'under_review', 'info_required', 'approved', 'rejected', 'edited'},
+    'under_review': {'submitted', 'info_required', 'approved', 'rejected', 'edited'},
+    'info_required': {'submitted', 'under_review', 'approved', 'rejected', 'edited'},
+    'rejected': {'submitted', 'under_review', 'approved', 'info_required'},
+    'approved': {'rejected', 'under_review', 'info_required', 'submitted'},
+    'edited': {'submitted', 'under_review', 'info_required', 'approved', 'rejected'},
 }
 
 

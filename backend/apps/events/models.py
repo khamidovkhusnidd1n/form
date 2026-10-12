@@ -58,6 +58,16 @@ class Event(models.Model):
         return self.registration_enabled and self.registration_deadline >= timezone.now().date()
 
 
+class EventPartner(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='partners')
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='events/partners/')
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+
 class EventGallery(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='gallery')
     image = models.ImageField(upload_to='events/gallery/')

@@ -107,11 +107,16 @@ export default function ApplicationsPage() {
       translations: finalTranslations,
     };
 
-    updateApplication(updated);
-    toast.success(t('common.success'));
-    setStatusModal(null);
-    setCommentTranslations({ uz: '', ru: '', en: '' });
-    setSavingStatus(false);
+    try {
+      await updateApplication(updated);
+      toast.success(t('common.success'));
+      setStatusModal(null);
+      setCommentTranslations({ uz: '', ru: '', en: '' });
+    } catch (err: any) {
+      toast.error(err?.response?.data?.detail || "Statusni o'zgartirishda xatolik yuz berdi");
+    } finally {
+      setSavingStatus(false);
+    }
   };
 
   const handleBulkStatusChange = async () => {
