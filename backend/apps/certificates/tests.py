@@ -8,7 +8,7 @@ from rest_framework.test import APIRequestFactory
 from apps.events.models import Event
 from apps.applications.models import Application
 from .models import Certificate
-from .services import generate_certificate, get_event_partners
+from .services import CERTIFICATE_LAYOUT_VERSION, generate_certificate, get_event_partners
 from .views import VerifyCertificateView
 from .layout import render_certificate
 
@@ -62,7 +62,8 @@ class CertificateVerificationTests(TestCase):
         unavailable_event = SimpleNamespace(partners=SimpleNamespace(
             all=lambda: (_ for _ in ()).throw(OperationalError('missing table')),
         ))
-        self.assertEqual(get_event_partners(unavailable_event), [])
+        self.assertEqual(len(get_event_partners(unavailable_event)), 5)
         with patch('apps.certificates.services.get_event_partners', return_value=[]):
             certificate = generate_certificate(self.application)
         self.assertTrue(certificate.pdf_file)
+        self.assertEqual(certificate.signature, CERTIFICATE_LAYOUT_VERSION)

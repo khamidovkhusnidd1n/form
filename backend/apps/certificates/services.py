@@ -2,6 +2,7 @@ import uuid
 import qrcode
 import io
 import logging
+from pathlib import Path
 from django.db import DatabaseError
 from django.core.files.base import ContentFile
 from django.conf import settings
@@ -9,6 +10,23 @@ from .models import Certificate
 
 
 logger = logging.getLogger(__name__)
+CERTIFICATE_LAYOUT_VERSION = 'partners-v1'
+PACKAGED_PARTNERS = (
+    ('Badiiy ta’lim markazi', 'markaz.png'),
+    ('O‘zbekiston Badiiy akademiyasi', 'badiiy-akademiya.png'),
+    ('Sharq san’ati va estetik ta’lim tadqiqot markazi', 'sharq-sanati.png'),
+    ('Hubei Institute of Fine Arts', 'hubei.png'),
+    ('Universiti Teknologi MARA', 'mara-emblem.png'),
+)
+
+
+def packaged_partners():
+    logos_dir = Path(__file__).resolve().parent.parent / 'events' / 'default_partner_logos'
+    return [
+        {'name': name, 'logo': str(logos_dir / filename)}
+        for name, filename in PACKAGED_PARTNERS
+        if (logos_dir / filename).is_file()
+    ]
 
 
 def get_event_partners(event):
@@ -16,8 +34,8 @@ def get_event_partners(event):
     try:
         return [{'name': partner.name, 'logo': partner.logo} for partner in event.partners.all()]
     except DatabaseError:
-        logger.warning('Hamkorlar jadvali hali tayyor emas; sertifikat logolarsiz yaratildi')
-        return []
+        logger.warning('Hamkorlar jadvali hali tayyor emas; sertifikat standart logolar bilan yaratildi')
+        return packaged_partners()
 
 
 def regenerate_event_certificates(event):
@@ -39,7 +57,7 @@ def regenerate_event_certificates(event):
 def generate_certificate(application):
     # Reuse existing certificate if it already has a file
     existing = Certificate.objects.filter(application=application).first()
-    if existing and existing.pdf_file:
+    if existing and existing.pdf_file and existing.signature == CERTIFICATE_LAYOUT_VERSION:
         if not application.certificate_pdf:
             application.certificate_pdf = existing.pdf_file
             application.save(update_fields=['certificate_pdf'])
@@ -76,6 +94,7 @@ def generate_certificate(application):
     cert.certificate_number = cert.certificate_number or cert_num
     cert.verification_token = token
     cert.status = Certificate.Status.ISSUED
+    cert.signature = CERTIFICATE_LAYOUT_VERSION
     cert.qr_code.save(f"qr_{token}.png", ContentFile(qr_io.getvalue()), save=False)
     cert.pdf_file.save(f"cert_{token}.pdf", ContentFile(pdf_bytes), save=False)
     cert.save()

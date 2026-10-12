@@ -108,15 +108,14 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
         """Return certificate URL; self-heal if approved but certificate missing."""
         if obj.status != 'approved':
             return None
-        if not obj.certificate_pdf:
-            try:
-                from apps.certificates.services import generate_certificate
-                generate_certificate(obj)
-                obj.refresh_from_db(fields=['certificate_pdf'])
-            except Exception:
-                import logging
-                logging.getLogger(__name__).exception("Sertifikatni yaratib bo'lmadi")
-                return None
+        try:
+            from apps.certificates.services import generate_certificate
+            generate_certificate(obj)
+            obj.refresh_from_db(fields=['certificate_pdf'])
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("Sertifikatni yaratib bo'lmadi")
+            return None
         pdf = obj.certificate_pdf
         if not pdf:
             return None
@@ -225,13 +224,12 @@ class ApplicationAdminSerializer(serializers.ModelSerializer):
     def get_certificate_pdf_url(self, obj):
         if obj.status != 'approved':
             return None
-        if not obj.certificate_pdf:
-            try:
-                from apps.certificates.services import generate_certificate
-                generate_certificate(obj)
-                obj.refresh_from_db(fields=['certificate_pdf'])
-            except Exception:
-                return None
+        try:
+            from apps.certificates.services import generate_certificate
+            generate_certificate(obj)
+            obj.refresh_from_db(fields=['certificate_pdf'])
+        except Exception:
+            return None
         pdf = obj.certificate_pdf
         if not pdf:
             return None
