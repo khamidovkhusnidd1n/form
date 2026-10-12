@@ -10,7 +10,7 @@ from .models import Certificate
 
 
 logger = logging.getLogger(__name__)
-CERTIFICATE_LAYOUT_VERSION = 'partners-v1'
+CERTIFICATE_LAYOUT_VERSION = 'english-v1'
 PACKAGED_PARTNERS = (
     ('Badiiy ta’lim markazi', 'markaz.png'),
     ('O‘zbekiston Badiiy akademiyasi', 'badiiy-akademiya.png'),
