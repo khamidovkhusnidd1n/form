@@ -302,8 +302,6 @@ export const translations = {
     'common.back': 'Orqaga',
     'common.autoTranslating': 'Barcha tillarga tarjima qilinmoqda...',
     'common.autoTranslatedSuccess': 'Muvaffaqiyatli tarjima qilindi!',
-  },
-  
     // Cabinet additions
     'cabinet.edit': 'Tahrirlash',
     'cabinet.editTitle': 'Arizani tahrirlash',
@@ -320,6 +318,7 @@ export const translations = {
     'cabinet.saveAndSubmit': 'Saqlash va Yuborish',
     'cabinet.noCertMsg': 'Hali sertifikatlar kiritilmadi, iltimos kuting.',
     'cabinet.understood': 'Tushundim',
+  },
 en: {
     // Navigation
     'nav.home': 'Home',
@@ -617,8 +616,6 @@ en: {
     'common.back': 'Back',
     'common.autoTranslating': 'Translating into all languages...',
     'common.autoTranslatedSuccess': 'Successfully translated!',
-  },
-  
     // Cabinet additions
     'cabinet.edit': 'Edit',
     'cabinet.editTitle': 'Edit Application',
@@ -635,6 +632,7 @@ en: {
     'cabinet.saveAndSubmit': 'Save and Submit',
     'cabinet.noCertMsg': 'Certificates are not added yet, please wait.',
     'cabinet.understood': 'Understood',
+  },
 ru: {
     // Navigation
     'nav.home': 'Главная',

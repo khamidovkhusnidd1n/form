@@ -9,6 +9,7 @@ import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
 import { getApplicationStatusLabel, APPLICATION_STATUS_COLORS } from '../../lib/utils';
+import { getCertificateUrl } from '../../lib/certificateUrl';
 
 export default function UserCabinet() {
   const { t, language } = useTranslation();
@@ -141,9 +142,15 @@ export default function UserCabinet() {
                 </button>
               
                 {app.status === 'approved' && (
+                  getCertificateUrl(app.certificate_pdf) ? (
+                    <a href={getCertificateUrl(app.certificate_pdf)!} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
+                      {t('cabinet.downloadCert')}
+                    </a>
+                  ) : (
                   <button onClick={() => setMissingCertModal(true)} className="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
                     {t("cabinet.downloadCert")}
                   </button>
+                  )
                 )}
               </div>
 
@@ -352,7 +359,7 @@ export default function UserCabinet() {
             onClick={() => setMissingCertModal(false)}
             className="mt-6 px-6 py-2 bg-[#1a56db] text-white font-medium rounded-xl hover:bg-blue-700"
           >
-            Tushundim
+            {t('cabinet.understood')}
           </button>
         </div>
       </Modal>

@@ -11,6 +11,7 @@ import { useTranslation, LANGUAGE_LABELS, type Language } from '../../i18n';
 import { useData } from '../../store/dataStore';
 import { getTranslatedContent, translateText, translateContentToAllLanguages } from '../../lib/translationService';
 import * as XLSX from 'xlsx';
+import { getCertificateUrl } from '../../lib/certificateUrl';
 
 const PAGE_SIZE = 8;
 
@@ -328,6 +329,11 @@ export default function ApplicationsPage() {
                         <MessageSquare className="w-4 h-4" />
                         </button>
                       {app.status === 'approved' && (
+                        getCertificateUrl(app.certificatePdfUrl) ? (
+                          <a href={getCertificateUrl(app.certificatePdfUrl)!} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors" title={t('cabinet.downloadCert')} aria-label={t('cabinet.downloadCert')}>
+                            <Download className="w-4 h-4" />
+                          </a>
+                        ) : (
                         <button 
                           onClick={() => setMissingCertModal(true)} 
                           className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-500 transition-colors" 
@@ -335,6 +341,7 @@ export default function ApplicationsPage() {
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         </button>
+                        )
                       )}
                       <button 
                         onClick={() => setDeleteConfirmModal({ type: 'single', id: app.id })}
