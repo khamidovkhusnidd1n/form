@@ -14,6 +14,7 @@ urlpatterns = [
     path('admin/bulk-remove/', views.bulk_delete_applications, name='bulk_delete_applications'),
     path('admin/bulk-remove', views.bulk_delete_applications),
     path('admin/bulk-status/', views.bulk_status_applications, name='bulk_status_applications'),
+    path('admin/<int:pk>/certificate/', views.issue_certificate, name='issue_certificate'),
     path('admin/<int:pk>/', views.AdminApplicationDetailView.as_view(), name='admin_application_detail'),
     path('admin/<int:pk>/status/', views.update_application_status, name='update_status'),
     path('admin/<int:pk>/check-in/', views.check_in_application, name='check_in'),

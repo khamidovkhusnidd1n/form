@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Eye, Download, ChevronLeft, ChevronRight, MessageSquare, CheckCircle, Globe, Sparkles, Trash2, AlertTriangle, Edit2 } from 'lucide-react';
+import { Search, Eye, Download, ChevronLeft, ChevronRight, MessageSquare, CheckCircle, Globe, Sparkles, Trash2, AlertTriangle, Edit2, Award } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { StatusBadge } from '../../components/ui/Badge';
@@ -12,12 +12,13 @@ import { useData } from '../../store/dataStore';
 import { getTranslatedContent, translateText, translateContentToAllLanguages } from '../../lib/translationService';
 import * as XLSX from 'xlsx';
 import { getCertificateUrl } from '../../lib/certificateUrl';
+import { apiClient } from '../../api/client';
 
 const PAGE_SIZE = 8;
 
 export default function ApplicationsPage() {
   const { t, language } = useTranslation();
-  const { applications, updateApplication, deleteApplication, deleteMultipleApplications, updateMultipleApplicationsStatus } = useData();
+  const { applications, updateApplication, deleteApplication, deleteMultipleApplications, updateMultipleApplicationsStatus, fetchApplications } = useData();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | 'all'>('all');
@@ -25,7 +26,7 @@ export default function ApplicationsPage() {
   const [selected, setSelected] = useState<Application | null>(null);
   const [statusModal, setStatusModal] = useState<Application | null>(null);
   const [bulkStatusModal, setBulkStatusModal] = useState(false);
-  const [missingCertModal, setMissingCertModal] = useState(false);
+  const [generatingCertificateId, setGeneratingCertificateId] = useState<number | null>(null);
   const [newStatus, setNewStatus] = useState<ApplicationStatus>('submitted');
   const [commentTranslations, setCommentTranslations] = useState<Record<Language, string>>({ uz: '', ru: '', en: '' });
   const [activeTabLang, setActiveTabLang] = useState<Language>('uz');
@@ -185,6 +186,19 @@ export default function ApplicationsPage() {
     }
   };
 
+  const handleGenerateCertificate = async (application: Application) => {
+    setGeneratingCertificateId(application.id);
+    try {
+      await apiClient.post(`/applications/admin/${application.id}/certificate/`);
+      await fetchApplications?.();
+      toast.success('Sertifikat shakllantirildi.');
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || 'Sertifikatni shakllantirib bo‘lmadi.');
+    } finally {
+      setGeneratingCertificateId(null);
+    }
+  };
+
   return (
     <div className="p-6 lg:p-8">
       <div className="flex items-center justify-between mb-8">
@@ -334,12 +348,15 @@ export default function ApplicationsPage() {
                             <Download className="w-4 h-4" />
                           </a>
                         ) : (
-                        <button 
-                          onClick={() => setMissingCertModal(true)} 
-                          className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-500 transition-colors" 
-                          title={t("cabinet.downloadCert")}
+                        <button
+                          onClick={() => handleGenerateCertificate(app)}
+                          disabled={generatingCertificateId === app.id}
+                          className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100 disabled:opacity-50 transition-colors"
+                          title="Sertifikatni shakllantirish"
+                          aria-label="Sertifikatni shakllantirish"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                          <Award className="w-4 h-4" />
+                          {generatingCertificateId === app.id ? 'Yaratilmoqda…' : 'Sertifikat'}
                         </button>
                         )
                       )}

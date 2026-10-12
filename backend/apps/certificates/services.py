@@ -10,7 +10,7 @@ from .models import Certificate
 
 
 logger = logging.getLogger(__name__)
-CERTIFICATE_LAYOUT_VERSION = 'english-v1'
+CERTIFICATE_LAYOUT_VERSION = 'admin-issued:english-v1'
 PACKAGED_PARTNERS = (
     ('Badiiy ta’lim markazi', 'markaz.png'),
     ('O‘zbekiston Badiiy akademiyasi', 'badiiy-akademiya.png'),
@@ -43,7 +43,10 @@ def regenerate_event_certificates(event):
     from apps.applications.models import Application
 
     refreshed = 0
-    applications = event.applications.filter(status=Application.Status.APPROVED)
+    applications = event.applications.filter(
+        status=Application.Status.APPROVED,
+        certificate__signature=CERTIFICATE_LAYOUT_VERSION,
+    )
     for application in applications:
         Certificate.objects.filter(application=application).delete()
         if application.certificate_pdf:

@@ -90,7 +90,12 @@ class TrackApplicationView(APIView):
             )
 
         invitation_url = request.build_absolute_uri(application.invitation_pdf.url) if application.invitation_pdf else None
-        certificate_url = request.build_absolute_uri(application.certificate_pdf.url) if application.certificate_pdf else None
+        from apps.certificates.models import Certificate
+        from apps.certificates.services import CERTIFICATE_LAYOUT_VERSION
+        certificate = Certificate.objects.filter(
+            application=application, signature=CERTIFICATE_LAYOUT_VERSION,
+        ).first()
+        certificate_url = request.build_absolute_uri(certificate.pdf_file.url) if certificate and certificate.pdf_file else None
 
         return Response({
             'application_id': application.application_id,
@@ -125,6 +130,34 @@ class AdminApplicationDetailView(generics.RetrieveDestroyAPIView):
     queryset = Application.objects.select_related('event').all()
     serializer_class = ApplicationAdminSerializer
     permission_classes = [IsModeratorOrAbove]
+
+
+@api_view(['POST'])
+@permission_classes([IsModeratorOrAbove])
+def issue_certificate(request, pk):
+    application = Application.objects.select_related('event').filter(pk=pk).first()
+    if not application:
+        return Response({'detail': "Ariza topilmadi."}, status=status.HTTP_404_NOT_FOUND)
+    if application.status != Application.Status.APPROVED:
+        return Response({'detail': "Sertifikat faqat tasdiqlangan ariza uchun shakllantiriladi."}, status=status.HTTP_400_BAD_REQUEST)
+
+    from apps.certificates.services import generate_certificate
+    try:
+        certificate = generate_certificate(application)
+    except Exception:
+        import logging
+        logging.getLogger(__name__).exception('Sertifikatni shakllantirib bo‘lmadi')
+        return Response({'detail': "Sertifikatni shakllantirib bo'lmadi."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    ApplicationService.log_action(
+        getattr(request.user, 'username', 'admin'), 'certificate_issue', [application.id],
+        {'application_id': application.application_id, 'certificate_number': certificate.certificate_number},
+    )
+    return Response({
+        'detail': 'Sertifikat shakllantirildi.',
+        'certificate_pdf_url': request.build_absolute_uri(certificate.pdf_file.url),
+        'certificate_number': certificate.certificate_number,
+    })
 
 
 @api_view(['PATCH'])

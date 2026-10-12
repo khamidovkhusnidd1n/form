@@ -105,18 +105,16 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_certificate_pdf(self, obj):
-        """Return certificate URL; self-heal if approved but certificate missing."""
+        """Return only certificates explicitly issued by an administrator."""
         if obj.status != 'approved':
             return None
         try:
-            from apps.certificates.services import generate_certificate
-            generate_certificate(obj)
-            obj.refresh_from_db(fields=['certificate_pdf'])
-        except Exception:
-            import logging
-            logging.getLogger(__name__).exception("Sertifikatni yaratib bo'lmadi")
+            from apps.certificates.models import Certificate
+            from apps.certificates.services import CERTIFICATE_LAYOUT_VERSION
+            certificate = Certificate.objects.get(application=obj, signature=CERTIFICATE_LAYOUT_VERSION)
+        except Certificate.DoesNotExist:
             return None
-        pdf = obj.certificate_pdf
+        pdf = certificate.pdf_file
         if not pdf:
             return None
         request = self.context.get('request')
@@ -225,12 +223,12 @@ class ApplicationAdminSerializer(serializers.ModelSerializer):
         if obj.status != 'approved':
             return None
         try:
-            from apps.certificates.services import generate_certificate
-            generate_certificate(obj)
-            obj.refresh_from_db(fields=['certificate_pdf'])
-        except Exception:
+            from apps.certificates.models import Certificate
+            from apps.certificates.services import CERTIFICATE_LAYOUT_VERSION
+            certificate = Certificate.objects.get(application=obj, signature=CERTIFICATE_LAYOUT_VERSION)
+        except Certificate.DoesNotExist:
             return None
-        pdf = obj.certificate_pdf
+        pdf = certificate.pdf_file
         if not pdf:
             return None
         req = self.context.get('request')

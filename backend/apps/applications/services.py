@@ -65,16 +65,6 @@ class ApplicationService:
                 {'application_id': application.application_id, 'from': old_status, 'to': new_status},
             )
 
-        if new_status == 'approved' and old_status != 'approved':
-            from apps.certificates.services import generate_certificate
-            from django.db import transaction
-            try:
-                with transaction.atomic():
-                    generate_certificate(application)
-            except Exception as e:
-                import logging
-                logging.error(f"Sertifikat yaratishda xatolik: {e}")
-                
         if new_status != old_status:
             NotificationService.send_status_email(application, new_status)
         return application
