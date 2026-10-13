@@ -92,6 +92,7 @@ class EventListView(generics.ListAPIView):
     queryset = Event.objects.all()
     serializer_class = EventListSerializer
     permission_classes = [permissions.AllowAny]
+    pagination_class = None
     filter_backends = [DjangoFilterBackend]
     filterset_class = EventFilter
 
@@ -105,6 +106,7 @@ class EventDetailView(generics.RetrieveAPIView):
 class AdminEventListCreateView(generics.ListCreateAPIView):
     queryset = Event.objects.all().order_by('-created_at')
     permission_classes = [IsModeratorOrAbove]
+    pagination_class = None
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_serializer_class(self):

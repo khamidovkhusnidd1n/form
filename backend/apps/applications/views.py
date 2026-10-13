@@ -119,6 +119,7 @@ class AdminApplicationListView(generics.ListAPIView):
     queryset = Application.objects.select_related('event').all()
     serializer_class = ApplicationAdminSerializer
     permission_classes = [IsModeratorOrAbove]
+    pagination_class = None
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ApplicationFilter
     search_fields = ['application_id', 'full_name', 'email', 'organization', 'presentation_title']

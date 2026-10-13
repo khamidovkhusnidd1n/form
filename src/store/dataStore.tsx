@@ -164,7 +164,27 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const fetchEvents = useCallback(async () => {
     try {
       const res = await apiClient.get('/events/');
-      const rawList = extractResults(res.data);
+      let rawList: any[] = [];
+      if (Array.isArray(res.data)) {
+        rawList = res.data;
+      } else if (res.data && Array.isArray(res.data.results)) {
+        rawList = [...res.data.results];
+        const totalCount = typeof res.data.count === 'number' ? res.data.count : rawList.length;
+        let currentPage = 2;
+        while (rawList.length < totalCount) {
+          try {
+            const pageRes = await apiClient.get(`/events/?page=${currentPage}`);
+            if (pageRes.data && Array.isArray(pageRes.data.results) && pageRes.data.results.length > 0) {
+              rawList.push(...pageRes.data.results);
+              currentPage++;
+            } else {
+              break;
+            }
+          } catch {
+            break;
+          }
+        }
+      }
       setEvents(rawList.map(transformEvent));
     } catch (err) {
       console.warn('Failed to fetch events from API:', err);
@@ -186,7 +206,27 @@ export function DataProvider({ children }: { children: ReactNode }) {
     if (!token) return;
     try {
       const res = await apiClient.get('/applications/admin/');
-      const rawList = extractResults(res.data);
+      let rawList: any[] = [];
+      if (Array.isArray(res.data)) {
+        rawList = res.data;
+      } else if (res.data && Array.isArray(res.data.results)) {
+        rawList = [...res.data.results];
+        const totalCount = typeof res.data.count === 'number' ? res.data.count : rawList.length;
+        let currentPage = 2;
+        while (rawList.length < totalCount) {
+          try {
+            const pageRes = await apiClient.get(`/applications/admin/?page=${currentPage}`);
+            if (pageRes.data && Array.isArray(pageRes.data.results) && pageRes.data.results.length > 0) {
+              rawList.push(...pageRes.data.results);
+              currentPage++;
+            } else {
+              break;
+            }
+          } catch {
+            break;
+          }
+        }
+      }
       setApplications(rawList.map(transformApplication));
     } catch (err) {
       console.warn('Failed to fetch applications from API:', err);
